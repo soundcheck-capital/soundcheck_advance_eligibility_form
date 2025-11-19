@@ -290,20 +290,57 @@ input[type=range]::-moz-range-thumb {
     sendEmail() {
         const email = this.shadowRoot.querySelector("#email").value;
         let sales = this.shadowRoot.getElementById("salesSlider").value;
-        var eventsSlider = this.shadowRoot.getElementById("eventsSlider").value;
-        var yearsSlider = this.shadowRoot.getElementById("yearsSlider").value;
+        var events = this.shadowRoot.getElementById("eventsSlider").value;
+        var years = this.shadowRoot.getElementById("yearsSlider").value;
         var eligibility = this.shadowRoot.getElementById("eligibilityAmount").innerText;
 
-        emailjs.send("service_p09r79s", "template_f3kgztv", {
-        user_email: email,
-        yearSlider: yearsSlider,
-        eventSlider: eventsSlider,
-        sales: sales,
-        eligibility: eligibility
-    }).then(response => {
-        alert("Email envoyé !");
-    }).catch(error => {
-    });
+        // Validation de l'email
+        if (!email || !email.includes('@')) {
+            alert("Veuillez entrer une adresse email valide.");
+            return;
+        }
+
+        const webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
+
+        const data = {
+            yearInBusiness: years,
+            numberOfEvent: events,
+            grossTicketSales: sales,
+            amountEligible: eligibility,
+            email: email
+        };
+
+        // Afficher un indicateur de chargement
+        const submitButton = this.shadowRoot.querySelector(".apply-btn");
+        const originalText = submitButton.textContent;
+        submitButton.textContent = "Envoi en cours...";
+        submitButton.disabled = true;
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Application soumise avec succès!");
+                // Réinitialiser le formulaire si souhaité
+                this.shadowRoot.querySelector("#email").value = '';
+            } else {
+                throw new Error('Erreur lors de la soumission');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert("Une erreur s'est produite. Veuillez réessayer.");
+        })
+        .finally(() => {
+            // Restaurer le bouton
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
     }
 }
 
