@@ -17,14 +17,46 @@ class CustomForm extends HTMLElement {
 #advanceForm {
     background: #ffffff;
     border-radius: 10px;
- width: min(90vw, 436px); /* 90% de la largeur de la fenêtre, max 436px */
-    height: auto; /* Ajuste la hauteur selon le contenu */
+    width: min(90vw, 436px);
+    height: auto;
     max-width: 436px;
-    min-width: 300px;     text-align: center;
+    min-width: 280px;
+    text-align: center;
     overflow: auto;
     display: flex;
     flex-direction: column;
     position: relative;
+    padding: 20px 15px;
+    box-sizing: border-box;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    #advanceForm {
+        width: 95vw;
+        padding: 18px 12px;
+        min-width: 280px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    #advanceForm {
+        width: 98vw;
+        padding: 15px 10px;
+        border-radius: 8px;
+        min-width: 260px;
+    }
+}
+
+.slider-container {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .slider-container {
+        margin-bottom: 15px;
+    }
 }
 
 .logo {
@@ -35,6 +67,15 @@ class CustomForm extends HTMLElement {
     right: 12px;
 }
 
+@media (max-width: 480px) {
+    .logo {
+        width: 26px;
+        height: 26px;
+        top: 6px;
+        right: 8px;
+    }
+}
+
 .questions {
     color: #434343;
     opacity: 80%;
@@ -42,8 +83,20 @@ class CustomForm extends HTMLElement {
     margin-bottom: 0 7px 0 0;
 }
 
+@media (max-width: 480px) {
+    .questions {
+        font-size: 14px;
+    }
+}
+
 .eligibilityLabel {
     color: #696969;
+}
+
+@media (max-width: 480px) {
+    .eligibilityLabel {
+        font-size: 14px;
+    }
 }
 
 input[type=range] {
@@ -54,6 +107,14 @@ input[type=range] {
     background: #e68900;
     border-radius: 5px;
     outline: none;
+    touch-action: none; /* Meilleure interaction tactile */
+}
+
+@media (max-width: 480px) {
+    input[type=range] {
+        width: 85%;
+        height: 4px;
+    }
 }
 
 /* Barre de progression avant et après le curseur (WebKit: Chrome, Safari, Edge) */
@@ -75,6 +136,20 @@ input[type=range]::-webkit-slider-thumb {
     cursor: pointer;
     margin-top: -4px;
     position: relative;
+}
+
+/* Curseur plus grand sur mobile pour meilleure interaction tactile */
+@media (max-width: 480px) {
+    input[type=range]::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+        margin-top: -5px;
+    }
+
+    input[type=range]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 /* Barre pour Firefox */
@@ -109,6 +184,12 @@ input[type=range]::-moz-range-thumb {
     margin: 0 12px 0 0;
 }
 
+@media (max-width: 480px) {
+    .amount {
+        font-size: 20px;
+    }
+}
+
 .eligibility {
     font-size: 35px;
     color: #e91e63;
@@ -116,8 +197,21 @@ input[type=range]::-moz-range-thumb {
     margin: 0 0 0 0;
 }
 
+@media (max-width: 768px) {
+    .eligibility {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .eligibility {
+        font-size: 28px;
+    }
+}
+
 .email-input {
     width: 90%;
+    max-width: 100%;
     height: 40px;
     border: 0.3px solid #03010A;
     border-radius: 6px;
@@ -126,7 +220,17 @@ input[type=range]::-moz-range-thumb {
     text-indent: 10px;
     padding: 0;
     align-self: center;
+    box-sizing: border-box;
+    font-size: 16px;
+}
 
+@media (max-width: 480px) {
+    .email-input {
+        width: 95%;
+        height: 44px;
+        font-size: 16px; /* Évite le zoom automatique sur iOS */
+        margin-top: 18px;
+    }
 }
 
 .apply-btn {
@@ -135,6 +239,7 @@ input[type=range]::-moz-range-thumb {
     border: none;
     padding: 10px;
     width: 90%;
+    max-width: 100%;
     height: 40px;
     border-radius: 6px;
     font-size: 1em;
@@ -142,10 +247,30 @@ input[type=range]::-moz-range-thumb {
     flex: content;
     align-self: center;
     margin-bottom: 13px;
+    box-sizing: border-box;
+    transition: background 0.3s ease;
 }
 
 .apply-btn:hover {
     background: #e68900;
+}
+
+.apply-btn:active {
+    background: #d67800;
+}
+
+.apply-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .apply-btn {
+        width: 95%;
+        height: 44px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
 }
             </style>
             <form id="advanceForm">
