@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Local - Advance Eligibility</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        h1 {
+            color: #333;
+            font-size: 18px;
+        }
+        .instructions {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+    <script src="./scriptform.js"></script>
+</head>
+<body>
+    <div>
+        <div class="test-container">
+            <h1>🧪 Test Local - Nouvelle Logique d'Advance</h1>
+
+            <div class="instructions">
+                <strong>Instructions de test:</strong>
+                <ol>
+                    <li>Ouvrez la console du navigateur (F12)</li>
+                    <li>Déplacez les sliders ci-dessous</li>
+                    <li>Vérifiez que l'advance ne dépasse JAMAIS $500,000</li>
+                    <li>Regardez les logs dans la console pour voir les calculs</li>
+                </ol>
+            </div>
+
+            <div id="status-check"></div>
+        </div>
+
+        <!-- Le formulaire -->
+        <custom-form></custom-form>
+
+        <div class="test-container">
+            <h1>📊 Scénarios de Test Rapides</h1>
+            <div id="test-scenarios">
+                <button onclick="testScenario(10, 50, 20000000)">Meilleur cas (10 ans, 50 events, $20M)</button><br><br>
+                <button onclick="testScenario(1, 1, 20000000)">Pire cas (1 an, 1 event, $20M)</button><br><br>
+                <button onclick="testScenario(5, 15, 10000000)">Moyen (5 ans, 15 events, $10M)</button><br><br>
+                <button onclick="testScenario(3, 3, 5000000)">Test frontière (3 ans, 3 events, $5M)</button>
+            </div>
+
+            <div class="console-output" id="output">
+                Cliquez sur un bouton de test ou déplacez les sliders...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Vérification que le custom element est chargé
+        window.addEventListener('DOMContentLoaded', () => {
+            const statusDiv = document.getElementById('status-check');
+            const customForm = document.querySelector('custom-form');
+
+            if (customForm && customForm.shadowRoot) {
+                statusDiv.innerHTML = '<div class="status success">✅ Custom Form chargé correctement!</div>';
+
+                // Intercepter les console.log pour les afficher dans la page
+                const originalLog = console.log;
+                const output = document.getElementById('output');
+
+                console.log = function(...args) {
+                    originalLog.apply(console, args);
+                    const message = args.join(' ');
+                    if (message.includes('Years:') || message.includes('Events:') || message.includes('Combined') || message.includes('Max Advance') || message.includes('Calculated')) {
+                        output.innerHTML += message + '<br>';
+                        output.scrollTop = output.scrollHeight;
+                    }
+                };
+            } else {
+                statusDiv.innerHTML = '<div class="status error">❌ Erreur: Custom Form non chargé</div>';
+            }
+        });
+
+        function testScenario(years, events, sales) {
+            const customForm = document.querySelector('custom-form');
+            if (!customForm || !customForm.shadowRoot) {
+                alert('Erreur: formulaire non trouvé');
+                return;
+            }
+
+            const output = document.getElementById('output');
+            output.innerHTML = `<strong>Test: ${years} ans, ${events} events, $${sales.toLocaleString()}</strong><br>` + '-'.repeat(50) + '<br>';
+
+            const yearsSlider = customForm.shadowRoot.getElementById('yearsSlider');
+            const eventsSlider = customForm.shadowRoot.getElementById('eventsSlider');
+            const salesSlider = customForm.shadowRoot.getElementById('salesSlider');
+
+            yearsSlider.value = years;
+            eventsSlider.value = events;
+            salesSlider.value = sales;
+
+            // Déclencher les événements
+            yearsSlider.dispatchEvent(new Event('input'));
+            eventsSlider.dispatchEvent(new Event('input'));
+            salesSlider.dispatchEvent(new Event('input'));
+
+            // Afficher le résultat
+            setTimeout(() => {
+                const result = customForm.shadowRoot.getElementById('eligibilityAmount').innerText;
+                output.innerHTML += `<br><strong>➡️ Résultat: ${result}</strong><br>`;
+
+                // Vérifier le cap
+                const amount = parseInt(result.replace(/[$,]/g, ''));
+                if (amount > 500000) {
+                    output.innerHTML += `<span style="color: red;">❌ ERREUR: Dépasse $500k!</span><br>`;
+                } else {
+                    output.innerHTML += `<span style="color: #00ff00;">✅ OK: Respecte le cap de $500k</span><br>`;
+                }
+                output.innerHTML += '<br>';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
