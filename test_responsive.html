@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Responsive - Advance Eligibility</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="./scriptform.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Archivo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .info {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .device-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .device-info strong {
+            color: #856404;
+        }
+
+        .container {
+            background: #222;
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .responsive-tips {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .responsive-tips h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .responsive-tips ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .responsive-tips li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            color: #666;
+        }
+
+        .responsive-tips li:last-child {
+            border-bottom: none;
+        }
+
+        .responsive-tips li::before {
+            content: "✓";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .screen-size {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .container {
+                padding: 20px;
+                min-height: auto;
+            }
+
+            .responsive-tips {
+                padding: 15px;
+                margin-top: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .responsive-tips h2 {
+                font-size: 18px;
+            }
+
+            .info {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 Test Responsive - Advance Eligibility Form</h1>
+        <div class="screen-size" id="screenSize"></div>
+        <p class="info">
+            Testez le formulaire sur différentes tailles d'écran en redimensionnant votre fenêtre de navigateur.
+        </p>
+        <div class="device-info">
+            <strong>Taille de l'écran :</strong> <span id="viewport"></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <custom-form></custom-form>
+    </div>
+
+    <div class="responsive-tips">
+        <h2>✨ Améliorations Responsive</h2>
+        <ul>
+            <li><strong>Desktop (>768px) :</strong> Largeur maximale 436px avec padding généreux</li>
+            <li><strong>Tablet (≤768px) :</strong> Largeur 95vw avec padding ajusté</li>
+            <li><strong>Mobile (≤480px) :</strong> Largeur 98vw avec éléments optimisés pour le tactile</li>
+            <li><strong>Sliders mobiles :</strong> Curseurs plus grands (14px) pour meilleure manipulation tactile</li>
+            <li><strong>Champs de saisie :</strong> Hauteur augmentée à 44px sur mobile (44px = taille recommandée iOS)</li>
+            <li><strong>Font-size 16px :</strong> Évite le zoom automatique sur iOS lors du focus</li>
+            <li><strong>Touch-action :</strong> Désactive les gestes tactiles concurrents sur les sliders</li>
+            <li><strong>Box-sizing :</strong> Border-box pour un dimensionnement cohérent</li>
+            <li><strong>Transitions :</strong> Effets visuels fluides sur les interactions</li>
+        </ul>
+    </div>
+
+    <script>
+        function updateScreenInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const screenSize = document.getElementById('screenSize');
+            const viewport = document.getElementById('viewport');
+
+            let deviceType = '';
+            if (width <= 480) {
+                deviceType = '📱 Mobile';
+            } else if (width <= 768) {
+                deviceType = '📱 Tablet';
+            } else {
+                deviceType = '💻 Desktop';
+            }
+
+            screenSize.textContent = `${deviceType} - ${width}px × ${height}px`;
+            viewport.textContent = `${width}px × ${height}px (${deviceType})`;
+        }
+
+        // Mettre à jour au chargement et au redimensionnement
+        updateScreenInfo();
+        window.addEventListener('resize', updateScreenInfo);
+
+        // Log pour debug
+        console.log('%c📱 Test Responsive Mode Activé', 'background: #4caf50; color: white; padding: 10px; font-size: 16px; font-weight: bold;');
+        console.log('Redimensionnez la fenêtre pour tester différentes résolutions:');
+        console.log('- Mobile: ≤480px');
+        console.log('- Tablet: 481-768px');
+        console.log('- Desktop: >768px');
+    </script>
+</body>
+</html>

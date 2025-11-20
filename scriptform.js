@@ -17,14 +17,46 @@ class CustomForm extends HTMLElement {
 #advanceForm {
     background: #ffffff;
     border-radius: 10px;
- width: min(90vw, 436px); /* 90% de la largeur de la fenêtre, max 436px */
-    height: auto; /* Ajuste la hauteur selon le contenu */
+    width: min(90vw, 436px);
+    height: auto;
     max-width: 436px;
-    min-width: 300px;     text-align: center;
+    min-width: 280px;
+    text-align: center;
     overflow: auto;
     display: flex;
     flex-direction: column;
     position: relative;
+    padding: 20px 15px;
+    box-sizing: border-box;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    #advanceForm {
+        width: 95vw;
+        padding: 18px 12px;
+        min-width: 280px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    #advanceForm {
+        width: 98vw;
+        padding: 15px 10px;
+        border-radius: 8px;
+        min-width: 260px;
+    }
+}
+
+.slider-container {
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .slider-container {
+        margin-bottom: 15px;
+    }
 }
 
 .logo {
@@ -35,6 +67,15 @@ class CustomForm extends HTMLElement {
     right: 12px;
 }
 
+@media (max-width: 480px) {
+    .logo {
+        width: 26px;
+        height: 26px;
+        top: 6px;
+        right: 8px;
+    }
+}
+
 .questions {
     color: #434343;
     opacity: 80%;
@@ -42,8 +83,20 @@ class CustomForm extends HTMLElement {
     margin-bottom: 0 7px 0 0;
 }
 
+@media (max-width: 480px) {
+    .questions {
+        font-size: 14px;
+    }
+}
+
 .eligibilityLabel {
     color: #696969;
+}
+
+@media (max-width: 480px) {
+    .eligibilityLabel {
+        font-size: 14px;
+    }
 }
 
 input[type=range] {
@@ -54,6 +107,14 @@ input[type=range] {
     background: #e68900;
     border-radius: 5px;
     outline: none;
+    touch-action: none; /* Meilleure interaction tactile */
+}
+
+@media (max-width: 480px) {
+    input[type=range] {
+        width: 85%;
+        height: 4px;
+    }
 }
 
 /* Barre de progression avant et après le curseur (WebKit: Chrome, Safari, Edge) */
@@ -75,6 +136,20 @@ input[type=range]::-webkit-slider-thumb {
     cursor: pointer;
     margin-top: -4px;
     position: relative;
+}
+
+/* Curseur plus grand sur mobile pour meilleure interaction tactile */
+@media (max-width: 480px) {
+    input[type=range]::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+        margin-top: -5px;
+    }
+
+    input[type=range]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 /* Barre pour Firefox */
@@ -109,6 +184,12 @@ input[type=range]::-moz-range-thumb {
     margin: 0 12px 0 0;
 }
 
+@media (max-width: 480px) {
+    .amount {
+        font-size: 20px;
+    }
+}
+
 .eligibility {
     font-size: 35px;
     color: #e91e63;
@@ -116,8 +197,21 @@ input[type=range]::-moz-range-thumb {
     margin: 0 0 0 0;
 }
 
+@media (max-width: 768px) {
+    .eligibility {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .eligibility {
+        font-size: 28px;
+    }
+}
+
 .email-input {
     width: 90%;
+    max-width: 100%;
     height: 40px;
     border: 0.3px solid #03010A;
     border-radius: 6px;
@@ -126,7 +220,17 @@ input[type=range]::-moz-range-thumb {
     text-indent: 10px;
     padding: 0;
     align-self: center;
+    box-sizing: border-box;
+    font-size: 16px;
+}
 
+@media (max-width: 480px) {
+    .email-input {
+        width: 95%;
+        height: 44px;
+        font-size: 16px; /* Évite le zoom automatique sur iOS */
+        margin-top: 18px;
+    }
 }
 
 .apply-btn {
@@ -135,6 +239,7 @@ input[type=range]::-moz-range-thumb {
     border: none;
     padding: 10px;
     width: 90%;
+    max-width: 100%;
     height: 40px;
     border-radius: 6px;
     font-size: 1em;
@@ -142,10 +247,30 @@ input[type=range]::-moz-range-thumb {
     flex: content;
     align-self: center;
     margin-bottom: 13px;
+    box-sizing: border-box;
+    transition: background 0.3s ease;
 }
 
 .apply-btn:hover {
     background: #e68900;
+}
+
+.apply-btn:active {
+    background: #d67800;
+}
+
+.apply-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .apply-btn {
+        width: 95%;
+        height: 44px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
 }
             </style>
             <form id="advanceForm">
@@ -214,70 +339,133 @@ input[type=range]::-moz-range-thumb {
 
     }
     
-    getPercentage(value, percentageTable) {
-        let range = percentageTable.find(entry => value >= entry.min && value <= entry.max);
-        return range ? range.percentage : 0;
+    getRiskScore(value, riskScoreTable) {
+        let range = riskScoreTable.find(entry => value >= entry.min && value <= entry.max);
+        return range ? range.score : 0;
     }
   
     calculateAdvance() {
         let sales = this.shadowRoot.getElementById("salesSlider").value;
         var events = this.shadowRoot.getElementById("eventsSlider").value;
         var years = this.shadowRoot.getElementById("yearsSlider").value;
-        const maxAdvance = 1000000;
-        const soundcheckBaseAdvance = 0.02;
-        const soundcheckMaxAdvance = 0.15;
-        const eventsAdvanceEligibilityFactor = [
-            { min: 1, max: 1, percentage: 0.00 },
-            { min: 2, max: 3, percentage: 0.05 },
-            { min: 4, max: 6, percentage: 0.15 },
-            { min: 7, max: 10, percentage: 0.30 },
-            { min: 11, max: 20, percentage: 0.50 },
-            { min: 21, max: 49, percentage: 0.80 },
-            { min: 50, max: 50, percentage: 1.00 }
+
+        // Maximum advance cap: $500k
+        const maxAdvance = 500000;
+
+        // Years in Business Risk Score
+        const yearsRiskScore = [
+            { min: 1, max: 1, score: 5 },      // Less than 1 year
+            { min: 2, max: 2, score: 3 },      // 1-2 years
+            { min: 3, max: 5, score: 1.5 },    // 2-5 years
+            { min: 6, max: 9, score: 0.5 },    // 5-10 years
+            { min: 10, max: 10, score: 0 }     // 10+ years
         ];
-    
-        const yearsAdvanceEligibilityFactor = [
-            { min: 0, max: 0, percentage: 0.00 },
-            { min: 1, max: 2, percentage: 0.15 },
-            { min: 3, max: 5, percentage: 0.40 },
-            { min: 6, max: 9, percentage: 0.70 },
-            { min: 10, max: 10, percentage: 1.00 },
+
+        // Number of Events Risk Score
+        const eventsRiskScore = [
+            { min: 1, max: 1, score: 9 },      // 1 event
+            { min: 2, max: 3, score: 7.2 },    // 2-3 events
+            { min: 4, max: 6, score: 5.85 },   // 4-6 events
+            { min: 7, max: 10, score: 4.5 },   // 7-10 events
+            { min: 11, max: 20, score: 2.7 },  // 11-20 events
+            { min: 21, max: 49, score: 0.45 }, // 21+ events
+            { min: 50, max: 50, score: 0 }     // 50+ events
         ];
-        var eventsAdvanceEligibility = this.getPercentage(events, eventsAdvanceEligibilityFactor);
-        console.log(eventsAdvanceEligibility);
-    
-        var yearsAdvanceEligibility = this.getPercentage(years, yearsAdvanceEligibilityFactor);
-        console.log(yearsAdvanceEligibility);
-        var range = soundcheckMaxAdvance - soundcheckBaseAdvance;
-        var scoring = (eventsAdvanceEligibility + yearsAdvanceEligibility) / 2;
-        var advanceEligibility = (soundcheckBaseAdvance + range) * scoring;
-    
-        let eligibility = sales * advanceEligibility;
+
+        // Get risk scores
+        var yearsRisk = this.getRiskScore(years, yearsRiskScore);
+        var eventsRisk = this.getRiskScore(events, eventsRiskScore);
+
+        // Calculate combined risk score
+        var combinedRiskScore = yearsRisk + eventsRisk;
+
+        console.log(`Years: ${years}, Years Risk: ${yearsRisk}`);
+        console.log(`Events: ${events}, Events Risk: ${eventsRisk}`);
+        console.log(`Combined Risk Score: ${combinedRiskScore}`);
+
+        // Determine Max Advance % based on combined risk score
+        var maxAdvancePercentage;
+        if (combinedRiskScore >= 0 && combinedRiskScore <= 4) {
+            maxAdvancePercentage = 0.10;  // 10%
+        } else if (combinedRiskScore > 4 && combinedRiskScore <= 8) {
+            maxAdvancePercentage = 0.075; // 7.5%
+        } else if (combinedRiskScore > 8 && combinedRiskScore <= 12) {
+            maxAdvancePercentage = 0.05;  // 5%
+        } else if (combinedRiskScore > 12 && combinedRiskScore <= 14) {
+            maxAdvancePercentage = 0.025; // 2.5%
+        } else {
+            maxAdvancePercentage = 0.025; // Default to lowest if score exceeds 14
+        }
+
+        console.log(`Max Advance %: ${maxAdvancePercentage * 100}%`);
+
+        // Calculate advance amount
+        let eligibility = sales * maxAdvancePercentage;
+
+        // Apply $500k cap
         if (eligibility > maxAdvance) {
             eligibility = maxAdvance;
         }
+
+        console.log(`Calculated Advance: $${parseInt(eligibility).toLocaleString("en-US")}`);
+
         this.shadowRoot.getElementById("eligibilityAmount").innerText = `$${parseInt(eligibility).toLocaleString("en-US")}`;
-    
-        
     }
     
     sendEmail() {
         const email = this.shadowRoot.querySelector("#email").value;
         let sales = this.shadowRoot.getElementById("salesSlider").value;
-        var eventsSlider = this.shadowRoot.getElementById("eventsSlider").value;
-        var yearsSlider = this.shadowRoot.getElementById("yearsSlider").value;
+        var events = this.shadowRoot.getElementById("eventsSlider").value;
+        var years = this.shadowRoot.getElementById("yearsSlider").value;
         var eligibility = this.shadowRoot.getElementById("eligibilityAmount").innerText;
 
-        emailjs.send("service_p09r79s", "template_f3kgztv", {
-        user_email: email,
-        yearSlider: yearsSlider,
-        eventSlider: eventsSlider,
-        sales: sales,
-        eligibility: eligibility
-    }).then(response => {
-        alert("Email envoyé !");
-    }).catch(error => {
-    });
+        // Validation de l'email
+        if (!email || !email.includes('@')) {
+            alert("Veuillez entrer une adresse email valide.");
+            return;
+        }
+
+        const webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
+
+        const data = {
+            yearInBusiness: years,
+            numberOfEvent: events,
+            grossTicketSales: sales,
+            amountEligible: eligibility,
+            email: email
+        };
+
+        // Afficher un indicateur de chargement
+        const submitButton = this.shadowRoot.querySelector(".apply-btn");
+        const originalText = submitButton.textContent;
+        submitButton.textContent = "Envoi en cours...";
+        submitButton.disabled = true;
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Application soumise avec succès!");
+                // Réinitialiser le formulaire si souhaité
+                this.shadowRoot.querySelector("#email").value = '';
+            } else {
+                throw new Error('Erreur lors de la soumission');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            alert("Une erreur s'est produite. Veuillez réessayer.");
+        })
+        .finally(() => {
+            // Restaurer le bouton
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
     }
 }
 
