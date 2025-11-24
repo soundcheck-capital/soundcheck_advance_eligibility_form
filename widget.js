@@ -1,6 +1,12 @@
 // Lightweight loader that pulls in the custom form component and mounts it.
 (function () {
     const scriptSource = (document.currentScript && document.currentScript.src) || document.baseURI;
+    const widgetScript = document.currentScript;
+    const scriptUrl = new URL(scriptSource, document.baseURI);
+    const widgetTheme =
+        (widgetScript && (widgetScript.dataset.theme || widgetScript.dataset.variant)) ||
+        scriptUrl.searchParams.get("theme") ||
+        scriptUrl.searchParams.get("variant");
 
     function ensureComponentLoaded() {
         if (window.customElements && customElements.get("custom-form")) {
@@ -29,8 +35,14 @@
             })();
 
         const alreadyMounted = target.querySelector("custom-form");
+        const element = alreadyMounted || document.createElement("custom-form");
+
+        if (widgetTheme) {
+            element.setAttribute("data-theme", widgetTheme);
+        }
+
         if (!alreadyMounted) {
-            target.appendChild(document.createElement("custom-form"));
+            target.appendChild(element);
         }
     }
 

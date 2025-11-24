@@ -7,6 +7,7 @@ class CustomForm extends HTMLElement {
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
             <style>
 :host {
     font-family: 'Archivo', sans-serif;
@@ -15,6 +16,19 @@ class CustomForm extends HTMLElement {
     align-items: left;
     height: auto;
     margin: 0;
+}
+
+:host([data-theme="venue-pilot"]) {
+    --vp-font: 'Open Sans', sans-serif;
+    --vp-text: #191F40;
+    --vp-background: #FEFCFB;
+    --vp-pink: #E9498C;
+    --vp-base-150: #F7F4F4;
+    --vp-base-600: #6B6E83;
+    --vp-base-900: #191F40;
+    --vp-base-100: #FEFBFA;
+    font-family: var(--vp-font);
+    color: var(--vp-text);
 }
 
 #advanceForm {
@@ -52,6 +66,10 @@ class CustomForm extends HTMLElement {
     }
 }
 
+:host([data-theme="venue-pilot"]) #advanceForm {
+    background: var(--vp-background);
+}
+
 .slider-container {
     margin-bottom: 20px;
 }
@@ -86,6 +104,11 @@ class CustomForm extends HTMLElement {
     margin-bottom: 0 7px 0 0;
 }
 
+.questions,
+.eligibilityLabel {
+    transition: color 0.2s ease;
+}
+
 @media (max-width: 480px) {
     .questions {
         font-size: 14px;
@@ -94,6 +117,18 @@ class CustomForm extends HTMLElement {
 
 .eligibilityLabel {
     color: #696969;
+}
+
+:host([data-theme="venue-pilot"]) .questions,
+:host([data-theme="venue-pilot"]) .eligibilityLabel {
+    color: var(--vp-base-600);
+    font-family: var(--vp-font);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: 0.2px;
+    opacity: 1;
 }
 
 @media (max-width: 480px) {
@@ -113,6 +148,10 @@ input[type=range] {
     touch-action: none; /* Meilleure interaction tactile */
 }
 
+:host([data-theme="venue-pilot"]) input[type=range] {
+    background: transparent;
+}
+
 @media (max-width: 480px) {
     input[type=range] {
         width: 85%;
@@ -128,6 +167,11 @@ input[type=range]::-webkit-slider-runnable-track {
     background: linear-gradient(to right, #e68900 var(--progress), #ddd var(--progress));
 }
 
+:host([data-theme="venue-pilot"]) input[type=range]::-webkit-slider-runnable-track {
+    height: 4px;
+    background: linear-gradient(to right, var(--vp-pink) var(--progress), #FEDCEA var(--progress));
+}
+
 /* Curseur du slider (WebKit) */
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -139,6 +183,13 @@ input[type=range]::-webkit-slider-thumb {
     cursor: pointer;
     margin-top: -4px;
     position: relative;
+}
+
+:host([data-theme="venue-pilot"]) input[type=range]::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--vp-pink);
+    margin-top: -5px;
 }
 
 /* Curseur plus grand sur mobile pour meilleure interaction tactile */
@@ -163,11 +214,20 @@ input[type=range]::-moz-range-track {
     background: #ddd;
 }
 
+:host([data-theme="venue-pilot"]) input[type=range]::-moz-range-track {
+    height: 4px;
+    background: #FEDCEA;
+}
+
 /* Partie remplie avant le curseur pour Firefox */
 input[type=range]::-moz-range-progress {
     background: #e68900;
     height: 6px;
     border-radius: 5px;
+}
+
+:host([data-theme="venue-pilot"]) input[type=range]::-moz-range-progress {
+    background: var(--vp-pink);
 }
 
 /* Curseur pour Firefox */
@@ -178,6 +238,12 @@ input[type=range]::-moz-range-thumb {
     background: #EE8933;
     cursor: pointer;
     border: none;
+}
+
+:host([data-theme="venue-pilot"]) input[type=range]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--vp-pink);
 }
 
 
@@ -198,6 +264,17 @@ input[type=range]::-moz-range-thumb {
     color: #e91e63;
     font-weight: 400;
     margin: 0 0 0 0;
+}
+
+.amount,
+.eligibility {
+    transition: color 0.2s ease;
+}
+
+:host([data-theme="venue-pilot"]) .amount,
+:host([data-theme="venue-pilot"]) .eligibility {
+    color: var(--vp-text);
+    font-family: var(--vp-font);
 }
 
 @media (max-width: 768px) {
@@ -227,6 +304,33 @@ input[type=range]::-moz-range-thumb {
     font-size: 16px;
 }
 
+:host([data-theme="venue-pilot"]) .email-input {
+    background: var(--vp-base-150);
+    border: 1px solid var(--vp-base-150);
+    color: var(--vp-base-900);
+    font-family: var(--vp-font);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: 0.2px;
+    caret-color: var(--vp-pink);
+    outline: none;
+}
+
+:host([data-theme="venue-pilot"]) .email-input::placeholder {
+    color: var(--vp-base-600);
+    font-family: var(--vp-font);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 150%;
+    letter-spacing: 0.2px;
+}
+
+:host([data-theme="venue-pilot"]) .email-input:focus {
+    border-color: var(--vp-pink);
+    box-shadow: 0 0 0 3px rgba(233, 73, 140, 0.15);
+}
+
 @media (max-width: 480px) {
     .email-input {
         width: 95%;
@@ -254,17 +358,40 @@ input[type=range]::-moz-range-thumb {
     transition: background 0.3s ease;
 }
 
+:host([data-theme="venue-pilot"]) .apply-btn {
+    background: var(--vp-pink);
+    color: var(--vp-base-100);
+    border-radius: 8px;
+    font-family: var(--vp-font);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 150%;
+    letter-spacing: 0.2px;
+}
+
 .apply-btn:hover {
     background: #e68900;
+}
+
+:host([data-theme="venue-pilot"]) .apply-btn:hover {
+    background: #d83e7f;
 }
 
 .apply-btn:active {
     background: #d67800;
 }
 
+:host([data-theme="venue-pilot"]) .apply-btn:active {
+    background: #c33873;
+}
+
 .apply-btn:disabled {
     background: #ccc;
     cursor: not-allowed;
+}
+
+:host([data-theme="venue-pilot"]) .apply-btn:disabled {
+    background: #eab7ce;
 }
 
 @media (max-width: 480px) {
