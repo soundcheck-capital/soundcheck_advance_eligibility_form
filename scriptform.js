@@ -117,13 +117,15 @@ class CustomForm extends HTMLElement {
 
 .eligibilityLabel {
     color: #696969;
+    font-size: 12px;
+    line-height: 150%;
 }
 
 :host([data-theme="venue-pilot"]) .questions,
 :host([data-theme="venue-pilot"]) .eligibilityLabel {
     color: var(--vp-base-600);
     font-family: var(--vp-font);
-    font-size: 14px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 150%;
@@ -133,7 +135,7 @@ class CustomForm extends HTMLElement {
 
 @media (max-width: 480px) {
     .eligibilityLabel {
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 
@@ -406,6 +408,11 @@ input[type=range]::-moz-range-thumb {
             <form id="advanceForm">
             <div class="slider-container">
                 <img src="https://guittoncandice.github.io/soundcheck_advance_eligibility_form/logo.jpg" class="logo" />
+                <p class="questions">For how long has your company been operating?</p>
+                <p class="amount answers" id="yearsOperating">5 years</p>
+                <input type="range" min="0" max="10" value="5" id="yearsSlider">
+            </div>
+            <div class="slider-container">
                 <p class="questions">How many events do you promote a year?</p>
                 <p class="amount answers" id="eventsCount">25 events</p>
                 <input type="range" min="1" max="50" value="25" id="eventsSlider">
@@ -413,16 +420,11 @@ input[type=range]::-moz-range-thumb {
             <div class="slider-container">
                 <p class="questions">How much gross ticket sales do you sell a year?</p>
                 <p class="amount answers" id="ticketSales">$10,000,000</p>
-                <input type="range" min="500000" max="20000000" step="500000" value="10000000" id="salesSlider">
-            </div>
-            <div class="slider-container">
-                <p class="questions">For how long has your company been operating?</p>
-                <p class="amount answers" id="yearsOperating">5 years</p>
-                <input type="range" min="1" max="10" value="5" id="yearsSlider">
+                <input type="range" min="100000" max="20000000" step="200000" value="10000000" id="salesSlider">
             </div>
             <div class="eligibilityDiv">
-                <p class="eligibilityLabel">You could be eligible for up to:</p>
                 <p class="eligibility" id="eligibilityAmount">$120,000</p>
+                <p class="eligibilityLabel">The estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email to complete the application</p>
             </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
             <button class="apply-btn" type="submit">Apply Now</button>
@@ -437,24 +439,25 @@ input[type=range]::-moz-range-thumb {
         });
         // Mettre à jour les valeurs des sliders
         this.shadowRoot.getElementById("yearsSlider").addEventListener("input", (event) => {
-                var input = event.target.value;
-                if(input == 1) this.shadowRoot.getElementById("yearsOperating").innerText = `${input} year`;
-                else if(input == 10) this.shadowRoot.getElementById("yearsOperating").innerText = `${input}+ years`;
+                const input = Number(event.target.value);
+                if(input === 0) this.shadowRoot.getElementById("yearsOperating").innerText = `0 years`;
+                else if(input === 1) this.shadowRoot.getElementById("yearsOperating").innerText = `${input} year`;
+                else if(input === 10) this.shadowRoot.getElementById("yearsOperating").innerText = `${input}+ years`;
                 else this.shadowRoot.getElementById("yearsOperating").innerText = `${input} years`;
                 this.calculateAdvance();
             });
 
             this.shadowRoot.getElementById("eventsSlider").addEventListener("input", (event) => {
-                var input = event.target.value;
-                if(input == 1) this.shadowRoot.getElementById("eventsCount").innerText = `${input} event`;
-                else if(input == 50) this.shadowRoot.getElementById("eventsCount").innerText = `${input}+ events`;
+                const input = Number(event.target.value);
+                if(input === 1) this.shadowRoot.getElementById("eventsCount").innerText = `${input} event`;
+                else if(input === 50) this.shadowRoot.getElementById("eventsCount").innerText = `${input}+ events`;
                 else this.shadowRoot.getElementById("eventsCount").innerText = `${input} events`;
                 this.calculateAdvance();
             });    
             this.shadowRoot.getElementById("salesSlider").addEventListener("input", (event) => {
-                var input = event.target.value;
-                if(input == 20000000) this.shadowRoot.getElementById("ticketSales").innerText =`$${Number(input).toLocaleString("en-US")}+`;
-                else this.shadowRoot.getElementById("ticketSales").innerText =`$${Number(input).toLocaleString("en-US")}`;
+                const input = Number(event.target.value);
+                if(input === 20000000) this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}+`;
+                else this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}`;
                 this.calculateAdvance();
             });  
         this.shadowRoot.querySelectorAll("input[type=range]").forEach(slider => {
@@ -475,31 +478,31 @@ input[type=range]::-moz-range-thumb {
     }
   
     calculateAdvance() {
-        let sales = this.shadowRoot.getElementById("salesSlider").value;
-        var events = this.shadowRoot.getElementById("eventsSlider").value;
-        var years = this.shadowRoot.getElementById("yearsSlider").value;
+        const sales = Number(this.shadowRoot.getElementById("salesSlider").value);
+        const events = Number(this.shadowRoot.getElementById("eventsSlider").value);
+        const years = Number(this.shadowRoot.getElementById("yearsSlider").value);
 
         // Maximum advance cap: $500k
         const maxAdvance = 500000;
 
         // Years in Business Risk Score
         const yearsRiskScore = [
-            { min: 1, max: 1, score: 5 },      // Less than 1 year
-            { min: 2, max: 2, score: 3 },      // 1-2 years
-            { min: 3, max: 5, score: 1.5 },    // 2-5 years
-            { min: 6, max: 9, score: 0.5 },    // 5-10 years
-            { min: 10, max: 10, score: 0 }     // 10+ years
+            { min: 0, max: 0, score: 10 },   // 0 years
+            { min: 1, max: 2, score: 8 },    // 1-2 years
+            { min: 3, max: 5, score: 5 },    // 3-5 years
+            { min: 6, max: 9, score: 3 },    // 6-9 years
+            { min: 10, max: 10, score: 0 }   // 10+ years
         ];
 
         // Number of Events Risk Score
         const eventsRiskScore = [
-            { min: 1, max: 1, score: 9 },      // 1 event
-            { min: 2, max: 3, score: 7.2 },    // 2-3 events
-            { min: 4, max: 6, score: 5.85 },   // 4-6 events
-            { min: 7, max: 10, score: 4.5 },   // 7-10 events
-            { min: 11, max: 20, score: 2.7 },  // 11-20 events
-            { min: 21, max: 49, score: 0.45 }, // 21+ events
-            { min: 50, max: 50, score: 0 }     // 50+ events
+            { min: 1, max: 1, score: 10 },    // 1 event
+            { min: 2, max: 3, score: 8 },     // 2-3 events
+            { min: 4, max: 6, score: 7 },     // 4-6 events
+            { min: 7, max: 10, score: 6 },    // 7-10 events
+            { min: 11, max: 20, score: 5 },   // 11-20 events
+            { min: 21, max: 49, score: 4 },   // 21+ events (until 49)
+            { min: 50, max: 50, score: 0 }    // 50+ events
         ];
 
         // Get risk scores
@@ -515,16 +518,14 @@ input[type=range]::-moz-range-thumb {
 
         // Determine Max Advance % based on combined risk score
         var maxAdvancePercentage;
-        if (combinedRiskScore >= 0 && combinedRiskScore <= 4) {
+        if (combinedRiskScore >= 0 && combinedRiskScore <= 5) {
             maxAdvancePercentage = 0.10;  // 10%
-        } else if (combinedRiskScore > 4 && combinedRiskScore <= 8) {
+        } else if (combinedRiskScore > 5 && combinedRiskScore <= 11) {
             maxAdvancePercentage = 0.075; // 7.5%
-        } else if (combinedRiskScore > 8 && combinedRiskScore <= 12) {
+        } else if (combinedRiskScore > 11 && combinedRiskScore <= 15) {
             maxAdvancePercentage = 0.05;  // 5%
-        } else if (combinedRiskScore > 12 && combinedRiskScore <= 14) {
-            maxAdvancePercentage = 0.025; // 2.5%
         } else {
-            maxAdvancePercentage = 0.025; // Default to lowest if score exceeds 14
+            maxAdvancePercentage = 0.025; // 2.5%
         }
 
         console.log(`Max Advance %: ${maxAdvancePercentage * 100}%`);
