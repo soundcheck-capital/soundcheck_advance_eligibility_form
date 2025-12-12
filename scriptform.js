@@ -119,6 +119,8 @@ class CustomForm extends HTMLElement {
     color: #696969;
     font-size: 12px;
     line-height: 150%;
+    max-width: 320px;
+    margin: 8px auto 0 auto;
 }
 
 :host([data-theme="venue-pilot"]) .questions,
@@ -265,7 +267,19 @@ input[type=range]::-moz-range-thumb {
     font-size: 35px;
     color: #e91e63;
     font-weight: 400;
-    margin: 0 0 0 0;
+    margin: 0;
+    display: inline;
+}
+
+.eligibilityDiv {
+    margin-top: 16px;
+}
+
+.eligibilityLine {
+    color: #000;
+    font-size: 35px;
+    font-weight: 400;
+    margin: 0 0 6px 0;
 }
 
 .amount,
@@ -423,7 +437,7 @@ input[type=range]::-moz-range-thumb {
                 <input type="range" min="100000" max="20000000" step="200000" value="10000000" id="salesSlider">
             </div>
             <div class="eligibilityDiv">
-                <p class="eligibility" id="eligibilityAmount">$120,000</p>
+                <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
                 <p class="eligibilityLabel">The estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email to complete the application</p>
             </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
