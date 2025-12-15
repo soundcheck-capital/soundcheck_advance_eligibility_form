@@ -19,7 +19,7 @@ class CustomForm extends HTMLElement {
 }
 
 :host([data-appearance="single-page"]) {
-    background: #fff;
+    background: #f3f4f6;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -117,8 +117,8 @@ class CustomForm extends HTMLElement {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin: 0 0 18px 0;
+    gap: 6px;
+    margin: 0 0 12px 0;
 }
 
 :host([data-appearance="single-page"]) .hero-logo {
@@ -133,6 +133,10 @@ class CustomForm extends HTMLElement {
     color: #0f172a;
     text-align: center;
     line-height: 1.2;
+}
+
+:host([data-appearance="single-page"]) .questions {
+    margin: 0 0 12px 0;
 }
 
 @media (max-width: 480px) {
@@ -468,8 +472,8 @@ input[type=range]::-moz-range-thumb {
             </style>
             <form id="advanceForm">
             <div class="hero">
-                <img src="logo_with_name.jpg" class="hero-logo" alt="SoundCheck Capital logo">
-                <p class="hero-heading">Get Funding. Promote Shows. Grow your Business.</p>
+                <img src="logo_with_name_2.jpg" class="hero-logo" alt="SoundCheck Capital logo">
+                <p class="hero-heading">Get Funding. Promote Shows.<br>Grow your Business.</p>
             </div>
             <div class="slider-container">
                 <img src="https://guittoncandice.github.io/soundcheck_advance_eligibility_form/logo.jpg" class="logo" />
