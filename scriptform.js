@@ -18,6 +18,17 @@ class CustomForm extends HTMLElement {
     margin: 0;
 }
 
+:host([data-appearance="single-page"]) {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 24px;
+}
+
 :host([data-theme="venue-pilot"]) {
     --vp-font: 'Open Sans', sans-serif;
     --vp-text: #191F40;
@@ -70,6 +81,12 @@ class CustomForm extends HTMLElement {
     background: var(--vp-background);
 }
 
+:host([data-appearance="single-page"]) #advanceForm {
+    background: #ffffff;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    margin: 0 auto;
+}
+
 .slider-container {
     margin-bottom: 20px;
 }
@@ -86,6 +103,36 @@ class CustomForm extends HTMLElement {
     position: absolute;
     top: 8px;
     right: 12px;
+}
+
+:host([data-appearance="single-page"]) .logo {
+    display: none;
+}
+
+.hero {
+    display: none;
+}
+
+:host([data-appearance="single-page"]) .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 18px 0;
+}
+
+:host([data-appearance="single-page"]) .hero-logo {
+    width: 140px;
+    height: auto;
+}
+
+:host([data-appearance="single-page"]) .hero-heading {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: center;
+    line-height: 1.2;
 }
 
 @media (max-width: 480px) {
@@ -420,6 +467,10 @@ input[type=range]::-moz-range-thumb {
 }
             </style>
             <form id="advanceForm">
+            <div class="hero">
+                <img src="logo_with_name.jpg" class="hero-logo" alt="SoundCheck Capital logo">
+                <p class="hero-heading">Get Funding. Promote Shows. Grow your Business.</p>
+            </div>
             <div class="slider-container">
                 <img src="https://guittoncandice.github.io/soundcheck_advance_eligibility_form/logo.jpg" class="logo" />
                 <p class="questions">For how long has your company been operating?</p>

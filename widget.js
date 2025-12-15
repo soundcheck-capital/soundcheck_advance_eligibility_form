@@ -7,6 +7,8 @@
         (widgetScript && (widgetScript.dataset.theme || widgetScript.dataset.variant)) ||
         scriptUrl.searchParams.get("theme") ||
         scriptUrl.searchParams.get("variant");
+    const widgetAppearance =
+        (widgetScript && widgetScript.dataset.appearance) || scriptUrl.searchParams.get("appearance");
 
     function ensureComponentLoaded() {
         if (window.customElements && customElements.get("custom-form")) {
@@ -39,6 +41,9 @@
 
         if (widgetTheme) {
             element.setAttribute("data-theme", widgetTheme);
+        }
+        if (widgetAppearance) {
+            element.setAttribute("data-appearance", widgetAppearance);
         }
 
         if (!alreadyMounted) {
