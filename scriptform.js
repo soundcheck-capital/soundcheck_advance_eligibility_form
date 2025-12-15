@@ -340,8 +340,15 @@ input[type=range]::-moz-range-thumb {
 
 :host([data-theme="venue-pilot"]) .amount,
 :host([data-theme="venue-pilot"]) .eligibility {
-    color: var(--vp-text);
     font-family: var(--vp-font);
+}
+
+:host([data-theme="venue-pilot"]) .amount {
+    color: var(--vp-text);
+}
+
+:host([data-theme="venue-pilot"]) .eligibility {
+    color: var(--vp-pink);
 }
 
 @media (max-width: 768px) {
