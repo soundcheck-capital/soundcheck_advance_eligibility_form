@@ -8,7 +8,7 @@ class CustomForm extends HTMLElement {
         );
         const scriptSrc = scriptFromDom ? scriptFromDom.src : '';
         const assetBase = scriptSrc ? new URL('.', scriptSrc) : new URL('.', window.location.href);
-        const heroLogoSrc = new URL('logo_with_name_2.jpg', assetBase).toString();
+        const heroLogoSrc = new URL('logo_black_bold.svg', assetBase).toString();
         const logoSrc = new URL('logo.jpg', assetBase).toString();
 
         this.shadowRoot.innerHTML = `
@@ -178,7 +178,7 @@ class CustomForm extends HTMLElement {
     color: #696969;
     font-size: 12px;
     line-height: 150%;
-    max-width: 320px;
+    max-width: 450px;
     margin: 8px auto 0 auto;
 }
 
@@ -488,11 +488,10 @@ input[type=range]::-moz-range-thumb {
             <form id="advanceForm">
             <div class="hero">
                 <img src="${heroLogoSrc}" class="hero-logo" alt="SoundCheck Capital logo">
-                <p class="hero-heading">Get Funding. Promote Shows.<br>Grow your Business.</p>
             </div>
             <div class="slider-container">
                 <img src="${logoSrc}" class="logo" />
-                <p class="questions">For how long has your company been operating?</p>
+                <p class="questions">How long have you been in business?</p>
                 <p class="amount answers" id="yearsOperating">5 years</p>
                 <input type="range" min="0" max="10" value="5" id="yearsSlider">
             </div>
@@ -508,7 +507,7 @@ input[type=range]::-moz-range-thumb {
             </div>
             <div class="eligibilityDiv">
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
-                <p class="eligibilityLabel">The estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email to complete the application</p>
+                <p class="eligibilityLabel">The estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email and complete the application</p>
             </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
             <button class="apply-btn" type="submit">Apply Now</button>
