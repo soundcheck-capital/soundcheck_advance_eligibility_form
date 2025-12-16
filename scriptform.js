@@ -3,6 +3,14 @@ class CustomForm extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
 
+        const scriptFromDom = document.currentScript || Array.from(document.querySelectorAll('script[src]')).find(
+            (scriptTag) => scriptTag.src.includes('scriptform.js')
+        );
+        const scriptSrc = scriptFromDom ? scriptFromDom.src : '';
+        const assetBase = scriptSrc ? new URL('.', scriptSrc) : new URL('.', window.location.href);
+        const heroLogoSrc = new URL('logo_with_name_2.jpg', assetBase).toString();
+        const logoSrc = new URL('logo.jpg', assetBase).toString();
+
         this.shadowRoot.innerHTML = `
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -479,11 +487,11 @@ input[type=range]::-moz-range-thumb {
             </style>
             <form id="advanceForm">
             <div class="hero">
-                <img src="logo_with_name_2.jpg" class="hero-logo" alt="SoundCheck Capital logo">
+                <img src="${heroLogoSrc}" class="hero-logo" alt="SoundCheck Capital logo">
                 <p class="hero-heading">Get Funding. Promote Shows.<br>Grow your Business.</p>
             </div>
             <div class="slider-container">
-                <img src="https://guittoncandice.github.io/soundcheck_advance_eligibility_form/logo.jpg" class="logo" />
+                <img src="${logoSrc}" class="logo" />
                 <p class="questions">For how long has your company been operating?</p>
                 <p class="amount answers" id="yearsOperating">5 years</p>
                 <input type="range" min="0" max="10" value="5" id="yearsSlider">
