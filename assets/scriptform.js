@@ -507,7 +507,7 @@ input[type=range]::-moz-range-thumb {
             </div>
             <div class="eligibilityDiv">
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
-                <p class="eligibilityLabel">The estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email and complete the application</p>
+                <p class="eligibilityLabel">This estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email.</p>
             </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
             <button class="apply-btn" type="submit">Apply Now</button>
