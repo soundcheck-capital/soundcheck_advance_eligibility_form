@@ -502,8 +502,8 @@ input[type=range]::-moz-range-thumb {
             </div>
             <div class="slider-container">
                 <p class="questions">How much gross ticket sales do you sell a year?</p>
-                <p class="amount answers" id="ticketSales">$10,000,000</p>
-                <input type="range" min="100000" max="20000000" step="200000" value="10000000" id="salesSlider">
+                <p class="amount answers" id="ticketSales">$2,500,000</p>
+                <input type="range" min="100000" max="5000000" step="100000" value="2500000" id="salesSlider">
             </div>
             <div class="eligibilityDiv">
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
@@ -523,7 +523,7 @@ input[type=range]::-moz-range-thumb {
         // Mettre à jour les valeurs des sliders
         this.shadowRoot.getElementById("yearsSlider").addEventListener("input", (event) => {
                 const input = Number(event.target.value);
-                if(input === 0) this.shadowRoot.getElementById("yearsOperating").innerText = `0 years`;
+                if(input === 0) this.shadowRoot.getElementById("yearsOperating").innerText = `0 year`;
                 else if(input === 1) this.shadowRoot.getElementById("yearsOperating").innerText = `${input} year`;
                 else if(input === 10) this.shadowRoot.getElementById("yearsOperating").innerText = `${input}+ years`;
                 else this.shadowRoot.getElementById("yearsOperating").innerText = `${input} years`;
@@ -539,8 +539,7 @@ input[type=range]::-moz-range-thumb {
             });    
             this.shadowRoot.getElementById("salesSlider").addEventListener("input", (event) => {
                 const input = Number(event.target.value);
-                if(input === 20000000) this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}+`;
-                else this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}`;
+                this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}`;
                 this.calculateAdvance();
             });  
         this.shadowRoot.querySelectorAll("input[type=range]").forEach(slider => {
@@ -564,6 +563,23 @@ input[type=range]::-moz-range-thumb {
         const sales = Number(this.shadowRoot.getElementById("salesSlider").value);
         const events = Number(this.shadowRoot.getElementById("eventsSlider").value);
         const years = Number(this.shadowRoot.getElementById("yearsSlider").value);
+        const eligibilityPrefix = this.shadowRoot.querySelector(".eligibilityPrefix");
+        const eligibilityAmountEl = this.shadowRoot.getElementById("eligibilityAmount");
+        const eligibilitySuffix = this.shadowRoot.querySelector(".eligibilitySuffix");
+
+        if (years === 0) {
+            eligibilityPrefix.textContent = "You're not eligible";
+            eligibilityAmountEl.textContent = "";
+            eligibilitySuffix.textContent = "";
+            eligibilityAmountEl.style.display = "none";
+            eligibilitySuffix.style.display = "none";
+            return;
+        }
+
+        eligibilityAmountEl.style.display = "";
+        eligibilitySuffix.style.display = "";
+        eligibilityPrefix.textContent = "You're eligible for up to ";
+        eligibilitySuffix.textContent = "!";
 
         // Maximum advance cap: $500k
         const maxAdvance = 500000;
@@ -623,7 +639,7 @@ input[type=range]::-moz-range-thumb {
 
         console.log(`Calculated Advance: $${parseInt(eligibility).toLocaleString("en-US")}`);
 
-        this.shadowRoot.getElementById("eligibilityAmount").innerText = `$${parseInt(eligibility).toLocaleString("en-US")}`;
+        eligibilityAmountEl.innerText = `$${parseInt(eligibility).toLocaleString("en-US")}`;
     }
     
     sendEmail() {
@@ -666,7 +682,7 @@ input[type=range]::-moz-range-thumb {
         })
         .then(response => {
             if (response.ok) {
-                alert("Application soumise avec succès!");
+                alert("Thank you for your submission. We’ll be in touch shortly.");
                 // Réinitialiser le formulaire si souhaité
                 this.shadowRoot.querySelector("#email").value = '';
             } else {
