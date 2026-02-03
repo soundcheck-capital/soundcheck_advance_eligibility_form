@@ -17,7 +17,7 @@
 
         return new Promise((resolve, reject) => {
             const loader = document.createElement("script");
-            loader.src = new URL("./scriptform.js", scriptSource).href;
+            loader.src = new URL("./assets/scriptform.js", scriptSource).href;
             loader.async = true;
             loader.onload = () => resolve();
             loader.onerror = () => reject(new Error("Impossible de charger le widget Soundcheck."));

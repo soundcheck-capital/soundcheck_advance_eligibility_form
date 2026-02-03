@@ -9,7 +9,7 @@ class CustomForm extends HTMLElement {
         const scriptSrc = scriptFromDom ? scriptFromDom.src : '';
         const assetBase = scriptSrc ? new URL('.', scriptSrc) : new URL('.', window.location.href);
         const heroLogoSrc = new URL('logo_black_bold.svg', assetBase).toString();
-        const logoSrc = new URL('logo.jpg', assetBase).toString();
+        const logoSrc = new URL('../favicon.svg', assetBase).toString();
 
         this.shadowRoot.innerHTML = `
             <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,8 +106,10 @@ class CustomForm extends HTMLElement {
 }
 
 .logo {
-    width: 30px;
     height: 30px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
     position: absolute;
     top: 8px;
     right: 12px;
@@ -149,8 +151,8 @@ class CustomForm extends HTMLElement {
 
 @media (max-width: 480px) {
     .logo {
-        width: 26px;
         height: 26px;
+        max-width: 140px;
         top: 6px;
         right: 8px;
     }
@@ -537,11 +539,20 @@ input[type=range]::-moz-range-thumb {
                 else this.shadowRoot.getElementById("eventsCount").innerText = `${input} events`;
                 this.calculateAdvance();
             });    
+            const formatSalesValue = (value) => {
+                if (value >= 5000000) return "$5M+";
+                return `$${value.toLocaleString("en-US")}`;
+            };
+
             this.shadowRoot.getElementById("salesSlider").addEventListener("input", (event) => {
                 const input = Number(event.target.value);
-                this.shadowRoot.getElementById("ticketSales").innerText =`$${input.toLocaleString("en-US")}`;
+                this.shadowRoot.getElementById("ticketSales").innerText = formatSalesValue(input);
                 this.calculateAdvance();
-            });  
+            });
+
+            this.shadowRoot.getElementById("ticketSales").innerText = formatSalesValue(
+                Number(this.shadowRoot.getElementById("salesSlider").value)
+            );
         this.shadowRoot.querySelectorAll("input[type=range]").forEach(slider => {
             function updateProgress() {
                 let percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
