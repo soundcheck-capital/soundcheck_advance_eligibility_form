@@ -1,4 +1,10 @@
 class CustomForm extends HTMLElement {
+    connectedCallback() {
+        // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
+        const theme = new URLSearchParams(window.location.search).get('theme');
+        if (theme && !this.hasAttribute('data-theme')) this.setAttribute('data-theme', theme);
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
