@@ -1,3 +1,17 @@
+/**
+ * Quick estimate, ported from express-form lib/estimate.ts (the "new model" sheet,
+ * tab "(1) Pre-Qual + Express"): risk score = years + events scores, the score band
+ * picks the rate, advance = rate × gross ticket sales, capped at $1M.
+ * The widget doesn't ask the company type, so it uses the Venue/Other/Promoter rate.
+ */
+function advanceMax(years, events, sales) {
+    const yearsScore = years >= 10 ? 0 : years >= 6 ? 3 : years >= 3 ? 5 : years >= 1 ? 8 : 10;
+    const eventsScore = events >= 50 ? 0 : events >= 21 ? 4 : events >= 11 ? 5 : events >= 7 ? 6 : events >= 4 ? 7 : events >= 2 ? 8 : 10;
+    const score = yearsScore + eventsScore;
+    const rate = score <= 5 ? 0.2 : score <= 11 ? 0.15 : score <= 15 ? 0.1 : 0.05;
+    return Math.min(1000000, Math.round(rate * sales));
+}
+
 class CustomForm extends HTMLElement {
     connectedCallback() {
         // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
@@ -615,7 +629,7 @@ input[type=range]::-moz-range-thumb {
             <div class="slider-container">
                 <p class="questions">How much gross ticket sales do you sell a year?</p>
                 <p class="amount answers" id="ticketSales">$2,500,000</p>
-                <input type="range" min="100000" max="5000000" step="100000" value="2500000" id="salesSlider">
+                <input type="range" min="100000" max="10000000" step="100000" value="2500000" id="salesSlider">
             </div>
             <div class="eligibilityDiv">
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
@@ -635,7 +649,7 @@ input[type=range]::-moz-range-thumb {
         // Mettre à jour les valeurs des sliders
         this.shadowRoot.getElementById("yearsSlider").addEventListener("input", (event) => {
                 const input = Number(event.target.value);
-                if(input === 0) this.shadowRoot.getElementById("yearsOperating").innerText = `0 year`;
+                if(input === 0) this.shadowRoot.getElementById("yearsOperating").innerText = `Less than a year`;
                 else if(input === 1) this.shadowRoot.getElementById("yearsOperating").innerText = `${input} year`;
                 else if(input === 10) this.shadowRoot.getElementById("yearsOperating").innerText = `${input}+ years`;
                 else this.shadowRoot.getElementById("yearsOperating").innerText = `${input} years`;
@@ -650,7 +664,7 @@ input[type=range]::-moz-range-thumb {
                 this.calculateAdvance();
             });    
             const formatSalesValue = (value) => {
-                if (value >= 5000000) return "$5M+";
+                if (value >= 10000000) return "$10M+";
                 return `$${value.toLocaleString("en-US")}`;
             };
 
@@ -672,95 +686,16 @@ input[type=range]::-moz-range-thumb {
             slider.addEventListener("input", updateProgress);
             updateProgress(); // Initialise la valeur au chargement de la page
         });
+        this.calculateAdvance();
 
     }
     
-    getRiskScore(value, riskScoreTable) {
-        let range = riskScoreTable.find(entry => value >= entry.min && value <= entry.max);
-        return range ? range.score : 0;
-    }
-  
     calculateAdvance() {
         const sales = Number(this.shadowRoot.getElementById("salesSlider").value);
         const events = Number(this.shadowRoot.getElementById("eventsSlider").value);
         const years = Number(this.shadowRoot.getElementById("yearsSlider").value);
-        const eligibilityPrefix = this.shadowRoot.querySelector(".eligibilityPrefix");
-        const eligibilityAmountEl = this.shadowRoot.getElementById("eligibilityAmount");
-        const eligibilitySuffix = this.shadowRoot.querySelector(".eligibilitySuffix");
-
-        if (years === 0) {
-            eligibilityPrefix.textContent = "You're not eligible";
-            eligibilityAmountEl.textContent = "";
-            eligibilitySuffix.textContent = "";
-            eligibilityAmountEl.style.display = "none";
-            eligibilitySuffix.style.display = "none";
-            return;
-        }
-
-        eligibilityAmountEl.style.display = "";
-        eligibilitySuffix.style.display = "";
-        eligibilityPrefix.textContent = "You're eligible for up to ";
-        eligibilitySuffix.textContent = "!";
-
-        // Maximum advance cap: $500k
-        const maxAdvance = 500000;
-
-        // Years in Business Risk Score
-        const yearsRiskScore = [
-            { min: 0, max: 0, score: 10 },   // 0 years
-            { min: 1, max: 2, score: 8 },    // 1-2 years
-            { min: 3, max: 5, score: 5 },    // 3-5 years
-            { min: 6, max: 9, score: 3 },    // 6-9 years
-            { min: 10, max: 10, score: 0 }   // 10+ years
-        ];
-
-        // Number of Events Risk Score
-        const eventsRiskScore = [
-            { min: 1, max: 1, score: 10 },    // 1 event
-            { min: 2, max: 3, score: 8 },     // 2-3 events
-            { min: 4, max: 6, score: 7 },     // 4-6 events
-            { min: 7, max: 10, score: 6 },    // 7-10 events
-            { min: 11, max: 20, score: 5 },   // 11-20 events
-            { min: 21, max: 49, score: 4 },   // 21+ events (until 49)
-            { min: 50, max: 50, score: 0 }    // 50+ events
-        ];
-
-        // Get risk scores
-        var yearsRisk = this.getRiskScore(years, yearsRiskScore);
-        var eventsRisk = this.getRiskScore(events, eventsRiskScore);
-
-        // Calculate combined risk score
-        var combinedRiskScore = yearsRisk + eventsRisk;
-
-        console.log(`Years: ${years}, Years Risk: ${yearsRisk}`);
-        console.log(`Events: ${events}, Events Risk: ${eventsRisk}`);
-        console.log(`Combined Risk Score: ${combinedRiskScore}`);
-
-        // Determine Max Advance % based on combined risk score
-        var maxAdvancePercentage;
-        if (combinedRiskScore >= 0 && combinedRiskScore <= 5) {
-            maxAdvancePercentage = 0.10;  // 10%
-        } else if (combinedRiskScore > 5 && combinedRiskScore <= 11) {
-            maxAdvancePercentage = 0.075; // 7.5%
-        } else if (combinedRiskScore > 11 && combinedRiskScore <= 15) {
-            maxAdvancePercentage = 0.05;  // 5%
-        } else {
-            maxAdvancePercentage = 0.025; // 2.5%
-        }
-
-        console.log(`Max Advance %: ${maxAdvancePercentage * 100}%`);
-
-        // Calculate advance amount
-        let eligibility = sales * maxAdvancePercentage;
-
-        // Apply $500k cap
-        if (eligibility > maxAdvance) {
-            eligibility = maxAdvance;
-        }
-
-        console.log(`Calculated Advance: $${parseInt(eligibility).toLocaleString("en-US")}`);
-
-        eligibilityAmountEl.innerText = `$${parseInt(eligibility).toLocaleString("en-US")}`;
+        this.shadowRoot.getElementById("eligibilityAmount").innerText =
+            `$${advanceMax(years, events, sales).toLocaleString("en-US")}`;
     }
     
     sendEmail() {
