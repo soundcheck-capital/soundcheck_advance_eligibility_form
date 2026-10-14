@@ -522,7 +522,7 @@ input[type=range]::-moz-range-thumb {
 }
 
 :host([data-theme="bem"]) .hero-logo {
-    width: 100px;
+    display: none;
 }
 
 :host([data-theme="bem"]) .eligibilityLine,
