@@ -3,6 +3,14 @@ class CustomForm extends HTMLElement {
         // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
         const theme = new URLSearchParams(window.location.search).get('theme');
         if (theme && !this.hasAttribute('data-theme')) this.setAttribute('data-theme', theme);
+        // @font-face is ignored inside shadow DOM, so theme fonts must be loaded on the page.
+        if (this.getAttribute('data-theme') === 'bem' && !document.getElementById('bem-fonts')) {
+            const fonts = document.createElement('link');
+            fonts.id = 'bem-fonts';
+            fonts.rel = 'stylesheet';
+            fonts.href = 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400&display=swap';
+            document.head.appendChild(fonts);
+        }
     }
 
     constructor() {
@@ -23,7 +31,6 @@ class CustomForm extends HTMLElement {
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap">
             <style>
 :host {
     font-family: 'Archivo', sans-serif;
@@ -502,6 +509,7 @@ input[type=range]::-moz-range-thumb {
 
 :host([data-theme="bem"]) {
     --bem-font: 'Lato', sans-serif;
+    --bem-serif: 'Merriweather', serif;
     --bem-dark: #201A16;
     --bem-purple: #5E4979;
     --bem-purple-dark: #4B3A61;
@@ -516,7 +524,8 @@ input[type=range]::-moz-range-thumb {
 
 :host([data-theme="bem"]) .partner-logo {
     display: block;
-    width: 200px;
+    margin: 0 auto;
+    width: 180px;
     height: auto;
     filter: invert(1); /* white-on-transparent source logo */
 }
@@ -528,6 +537,16 @@ input[type=range]::-moz-range-thumb {
 :host([data-theme="bem"]) .eligibilityLine,
 :host([data-theme="bem"]) .amount {
     color: var(--bem-dark);
+    font-family: var(--bem-font);
+    font-weight: 300;
+}
+
+/* Their site: Merriweather 300 for body copy, Lato for headings and CTAs */
+:host([data-theme="bem"]) .questions,
+:host([data-theme="bem"]) .eligibilityLabel,
+:host([data-theme="bem"]) .email-input {
+    font-family: var(--bem-serif);
+    font-weight: 300;
 }
 
 :host([data-theme="bem"]) .eligibility {
@@ -568,7 +587,8 @@ input[type=range]::-moz-range-thumb {
     background: var(--bem-purple);
     font-family: var(--bem-font);
     font-weight: 700;
-    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 :host([data-theme="bem"]) .apply-btn:hover,
