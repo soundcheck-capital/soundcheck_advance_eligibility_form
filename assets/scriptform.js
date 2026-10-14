@@ -16,12 +16,14 @@ class CustomForm extends HTMLElement {
         const assetBase = scriptSrc ? new URL('.', scriptSrc) : new URL('.', window.location.href);
         const heroLogoSrc = new URL('logo_black_bold.svg', assetBase).toString();
         const logoSrc = new URL('../favicon.svg', assetBase).toString();
+        const bemLogoSrc = new URL('bem_logo_white.png', assetBase).toString();
 
         this.shadowRoot.innerHTML = `
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap">
             <style>
 :host {
     font-family: 'Archivo', sans-serif;
@@ -492,9 +494,91 @@ input[type=range]::-moz-range-thumb {
         margin-bottom: 10px;
     }
 }
+
+/* BEM (Bauer Entertainment Marketing): colors from bauerentertainmentmarketing.com */
+.partner-logo {
+    display: none;
+}
+
+:host([data-theme="bem"]) {
+    --bem-font: 'Lato', sans-serif;
+    --bem-dark: #201A16;
+    --bem-purple: #5E4979;
+    --bem-purple-dark: #4B3A61;
+    --bem-purple-light: #E4DEEA;
+    font-family: var(--bem-font);
+    color: var(--bem-dark);
+}
+
+:host([data-theme="bem"][data-appearance="single-page"]) {
+    background: var(--bem-dark);
+}
+
+:host([data-theme="bem"]) .partner-logo {
+    display: block;
+    width: 200px;
+    height: auto;
+    filter: invert(1); /* white-on-transparent source logo */
+}
+
+:host([data-theme="bem"]) .hero-logo {
+    width: 100px;
+}
+
+:host([data-theme="bem"]) .eligibilityLine,
+:host([data-theme="bem"]) .amount {
+    color: var(--bem-dark);
+}
+
+:host([data-theme="bem"]) .eligibility {
+    color: var(--bem-purple);
+}
+
+:host([data-theme="bem"]) input[type=range] {
+    background: transparent;
+}
+
+:host([data-theme="bem"]) input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--bem-purple) var(--progress), var(--bem-purple-light) var(--progress));
+}
+
+:host([data-theme="bem"]) input[type=range]::-webkit-slider-thumb {
+    background: var(--bem-purple);
+}
+
+:host([data-theme="bem"]) input[type=range]::-moz-range-thumb {
+    background: var(--bem-purple);
+}
+
+:host([data-theme="bem"]) input[type=range]::-moz-range-progress {
+    background: var(--bem-purple);
+}
+
+:host([data-theme="bem"]) input[type=range]::-moz-range-track {
+    background: var(--bem-purple-light);
+}
+
+:host([data-theme="bem"]) .email-input:focus {
+    outline: none;
+    border-color: var(--bem-purple);
+    box-shadow: 0 0 0 3px rgba(94, 73, 121, 0.15);
+}
+
+:host([data-theme="bem"]) .apply-btn {
+    background: var(--bem-purple);
+    font-family: var(--bem-font);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+:host([data-theme="bem"]) .apply-btn:hover,
+:host([data-theme="bem"]) .apply-btn:active {
+    background: var(--bem-purple-dark);
+}
             </style>
             <form id="advanceForm">
             <div class="hero">
+                <img src="${bemLogoSrc}" class="partner-logo" alt="Bauer Entertainment Marketing logo">
                 <img src="${heroLogoSrc}" class="hero-logo" alt="SoundCheck Capital logo">
             </div>
             <div class="slider-container">
