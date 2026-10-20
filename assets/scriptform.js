@@ -564,8 +564,9 @@ input[type=range]::-moz-range-thumb {
     color: var(--bem-dark);
 }
 
+/* Same purple as soundcheckcapital.com/bem, which embeds this page */
 :host([data-theme="bem"][data-appearance="single-page"]) {
-    background: var(--bem-dark);
+    background: #5F497A;
 }
 
 :host([data-theme="bem"]) .partner-logo {
