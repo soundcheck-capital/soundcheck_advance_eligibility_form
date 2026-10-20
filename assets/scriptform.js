@@ -12,6 +12,30 @@ function advanceMax(years, events, sales) {
     return Math.min(1000000, Math.round(rate * sales));
 }
 
+/**
+ * Partner pages (bem): payload for the website simulator's n8n webhook, which creates contact +
+ * company + deal in HubSpot tagged with the partner. null when a required field is missing.
+ */
+function partnerPayload(f) {
+    const t = (v) => String(v ?? '').trim();
+    const partnerQuote = Number(t(f.partnerQuote));
+    if (!t(f.firstName) || !t(f.lastName) || !t(f.website) || !(partnerQuote > 0)) return null;
+    return {
+        formType: 'simulator',
+        partner: f.partner,
+        partnerQuote,
+        firstName: t(f.firstName),
+        lastName: t(f.lastName),
+        website: t(f.website),
+        email: f.email,
+        yearsInBusiness: f.years,
+        numberOfEvents: f.events,
+        grossTicketSales: f.sales,
+        advanceAmount: advanceMax(Number(f.years), Number(f.events), Number(f.sales)),
+        sourceUrl: f.sourceUrl,
+    };
+}
+
 class CustomForm extends HTMLElement {
     connectedCallback() {
         // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
@@ -548,6 +572,25 @@ input[type=range]::-moz-range-thumb {
     display: none;
 }
 
+/* Partner pages: the client already has a BEM quote, so ask for it instead of showing our estimate */
+.partner-fields {
+    display: none;
+    flex-direction: column;
+    margin-top: 16px;
+}
+
+.partner-fields .email-input {
+    margin: 6px 0 0 0;
+}
+
+:host([data-theme="bem"]) .partner-fields {
+    display: flex;
+}
+
+:host([data-theme="bem"]) .eligibilityDiv {
+    display: none;
+}
+
 :host([data-theme="bem"]) .eligibilityLine,
 :host([data-theme="bem"]) .amount {
     color: var(--bem-dark);
@@ -635,6 +678,13 @@ input[type=range]::-moz-range-thumb {
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
                 <p class="eligibilityLabel">This estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email.</p>
             </div>
+            <div class="partner-fields">
+                <p class="questions">How much is your BEM quote?</p>
+                <input id="partnerQuote" type="number" min="0" step="any" inputmode="decimal" class="email-input" placeholder="$150,000">
+                <input id="firstName" class="email-input" placeholder="First name" autocomplete="given-name">
+                <input id="lastName" class="email-input" placeholder="Last name" autocomplete="family-name">
+                <input id="website" class="email-input" placeholder="Company website" autocomplete="url">
+            </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
             <button class="apply-btn" type="submit">Apply Now</button>
         </form>
@@ -711,10 +761,10 @@ input[type=range]::-moz-range-thumb {
             return;
         }
 
-        const webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
+        let webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
         const sourceUrl = window.location.href;
 
-        const data = {
+        let data = {
             yearInBusiness: years,
             numberOfEvent: events,
             grossTicketSales: sales,
@@ -722,6 +772,20 @@ input[type=range]::-moz-range-thumb {
             email: email,
             sourceUrl: sourceUrl,
         };
+
+        // Partner pages go to the website simulator's n8n webhook instead of the Make email flow.
+        if (this.getAttribute('data-theme') === 'bem') {
+            const field = (id) => this.shadowRoot.getElementById(id).value;
+            data = partnerPayload({
+                partner: 'bem', partnerQuote: field('partnerQuote'), firstName: field('firstName'),
+                lastName: field('lastName'), website: field('website'), email, years, events, sales, sourceUrl,
+            });
+            if (!data) {
+                alert("Please fill in your BEM quote, first name, last name and company website.");
+                return;
+            }
+            webhookUrl = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
+        }
 
         // Afficher un indicateur de chargement
         const submitButton = this.shadowRoot.querySelector(".apply-btn");
