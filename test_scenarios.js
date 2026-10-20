@@ -25,3 +25,17 @@ for (const [years, events, sales, expected] of cases) {
     assert.strictEqual(ctx.advanceMax(years, events, sales), expected, `${years}y ${events}ev $${sales}`);
 }
 console.log(`ok: ${cases.length} cases`);
+
+// Partner pages (bem): payload for the n8n website webhook, null when a required field is missing.
+const f = { partner: 'bem', partnerQuote: ' 150000 ', firstName: ' Ann ', lastName: 'Lee', website: 'qwix.com', email: 'a@b.co', years: '5', events: '25', sales: '2500000', sourceUrl: 'https://x/bem/' };
+const p = ctx.partnerPayload(f);
+assert.strictEqual(p.formType, 'simulator');
+assert.strictEqual(p.partner, 'bem');
+assert.strictEqual(p.partnerQuote, 150000);
+assert.strictEqual(p.firstName, 'Ann');
+assert.strictEqual(p.website, 'qwix.com');
+assert.strictEqual(p.advanceAmount, 375000);
+assert.strictEqual(p.sourceUrl, 'https://x/bem/');
+for (const k of ['partnerQuote', 'firstName', 'lastName', 'website']) assert.strictEqual(ctx.partnerPayload({ ...f, [k]: ' ' }), null, k);
+assert.strictEqual(ctx.partnerPayload({ ...f, partnerQuote: '0' }), null, 'zero quote');
+console.log('ok: partner payload');

@@ -12,6 +12,30 @@ function advanceMax(years, events, sales) {
     return Math.min(1000000, Math.round(rate * sales));
 }
 
+/**
+ * Partner pages (bem): payload for the website simulator's n8n webhook, which creates contact +
+ * company + deal in HubSpot tagged with the partner. null when a required field is missing.
+ */
+function partnerPayload(f) {
+    const t = (v) => String(v ?? '').trim();
+    const partnerQuote = Number(t(f.partnerQuote));
+    if (!t(f.firstName) || !t(f.lastName) || !t(f.website) || !(partnerQuote > 0)) return null;
+    return {
+        formType: 'simulator',
+        partner: f.partner,
+        partnerQuote,
+        firstName: t(f.firstName),
+        lastName: t(f.lastName),
+        website: t(f.website),
+        email: f.email,
+        yearsInBusiness: f.years,
+        numberOfEvents: f.events,
+        grossTicketSales: f.sales,
+        advanceAmount: advanceMax(Number(f.years), Number(f.events), Number(f.sales)),
+        sourceUrl: f.sourceUrl,
+    };
+}
+
 class CustomForm extends HTMLElement {
     connectedCallback() {
         // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
@@ -749,31 +773,18 @@ input[type=range]::-moz-range-thumb {
             sourceUrl: sourceUrl,
         };
 
-        // Partner pages create the full HubSpot record (contact + company + deal tagged with the
-        // partner) through the website simulator's n8n webhook, instead of the Make email flow.
-        const partner = this.getAttribute('data-theme') === 'bem' ? 'bem' : '';
-        if (partner) {
-            const field = (id) => this.shadowRoot.getElementById(id).value.trim();
-            const partnerQuote = Number(field('partnerQuote'));
-            if (!field('firstName') || !field('lastName') || !field('website') || !(partnerQuote > 0)) {
+        // Partner pages go to the website simulator's n8n webhook instead of the Make email flow.
+        if (this.getAttribute('data-theme') === 'bem') {
+            const field = (id) => this.shadowRoot.getElementById(id).value;
+            data = partnerPayload({
+                partner: 'bem', partnerQuote: field('partnerQuote'), firstName: field('firstName'),
+                lastName: field('lastName'), website: field('website'), email, years, events, sales, sourceUrl,
+            });
+            if (!data) {
                 alert("Please fill in your BEM quote, first name, last name and company website.");
                 return;
             }
             webhookUrl = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
-            data = {
-                formType: 'simulator',
-                partner,
-                partnerQuote,
-                firstName: field('firstName'),
-                lastName: field('lastName'),
-                website: field('website'),
-                email,
-                yearsInBusiness: years,
-                numberOfEvents: events,
-                grossTicketSales: sales,
-                advanceAmount: advanceMax(Number(years), Number(events), Number(sales)),
-                sourceUrl,
-            };
         }
 
         // Afficher un indicateur de chargement
