@@ -49,6 +49,14 @@ class CustomForm extends HTMLElement {
             fonts.href = 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400&display=swap';
             document.head.appendChild(fonts);
         }
+        // In an iframe (e.g. soundcheckcapital.com/bem), post the card height like the Express form
+        // does, so the parent's ExpressEmbed sizes the iframe. +48 = the single-page host padding.
+        if (window.parent !== window) {
+            const form = this.shadowRoot.getElementById('advanceForm');
+            new ResizeObserver(() => window.parent.postMessage(
+                { type: 'soundcheck-express:height', height: Math.ceil(form.getBoundingClientRect().height) + 48 }, '*'
+            )).observe(form);
+        }
     }
 
     constructor() {
