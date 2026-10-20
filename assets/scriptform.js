@@ -548,6 +548,25 @@ input[type=range]::-moz-range-thumb {
     display: none;
 }
 
+/* Partner pages: the client already has a BEM quote, so ask for it instead of showing our estimate */
+.partner-fields {
+    display: none;
+    flex-direction: column;
+    margin-top: 16px;
+}
+
+.partner-fields .email-input {
+    margin: 6px 0 0 0;
+}
+
+:host([data-theme="bem"]) .partner-fields {
+    display: flex;
+}
+
+:host([data-theme="bem"]) .eligibilityDiv {
+    display: none;
+}
+
 :host([data-theme="bem"]) .eligibilityLine,
 :host([data-theme="bem"]) .amount {
     color: var(--bem-dark);
@@ -635,6 +654,13 @@ input[type=range]::-moz-range-thumb {
                 <p class="eligibilityLine"><span class="eligibilityPrefix">You're eligible for up to </span><span class="eligibility" id="eligibilityAmount">$120,000</span><span class="eligibilitySuffix">!</span></p>
                 <p class="eligibilityLabel">This estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email.</p>
             </div>
+            <div class="partner-fields">
+                <p class="questions">How much is your BEM quote?</p>
+                <input id="partnerQuote" type="number" min="0" step="any" inputmode="decimal" class="email-input" placeholder="$150,000">
+                <input id="firstName" class="email-input" placeholder="First name" autocomplete="given-name">
+                <input id="lastName" class="email-input" placeholder="Last name" autocomplete="family-name">
+                <input id="website" class="email-input" placeholder="Company website" autocomplete="url">
+            </div>
             <input id="email" type="email" class="email-input" placeholder="your-email@google.com">
             <button class="apply-btn" type="submit">Apply Now</button>
         </form>
@@ -711,10 +737,10 @@ input[type=range]::-moz-range-thumb {
             return;
         }
 
-        const webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
+        let webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
         const sourceUrl = window.location.href;
 
-        const data = {
+        let data = {
             yearInBusiness: years,
             numberOfEvent: events,
             grossTicketSales: sales,
@@ -722,6 +748,33 @@ input[type=range]::-moz-range-thumb {
             email: email,
             sourceUrl: sourceUrl,
         };
+
+        // Partner pages create the full HubSpot record (contact + company + deal tagged with the
+        // partner) through the website simulator's n8n webhook, instead of the Make email flow.
+        const partner = this.getAttribute('data-theme') === 'bem' ? 'bem' : '';
+        if (partner) {
+            const field = (id) => this.shadowRoot.getElementById(id).value.trim();
+            const partnerQuote = Number(field('partnerQuote'));
+            if (!field('firstName') || !field('lastName') || !field('website') || !(partnerQuote > 0)) {
+                alert("Please fill in your BEM quote, first name, last name and company website.");
+                return;
+            }
+            webhookUrl = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
+            data = {
+                formType: 'simulator',
+                partner,
+                partnerQuote,
+                firstName: field('firstName'),
+                lastName: field('lastName'),
+                website: field('website'),
+                email,
+                yearsInBusiness: years,
+                numberOfEvents: events,
+                grossTicketSales: sales,
+                advanceAmount: advanceMax(Number(years), Number(events), Number(sales)),
+                sourceUrl,
+            };
+        }
 
         // Afficher un indicateur de chargement
         const submitButton = this.shadowRoot.querySelector(".apply-btn");
