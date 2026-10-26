@@ -39,3 +39,11 @@ assert.strictEqual(p.sourceUrl, 'https://x/bem/');
 for (const k of ['partnerQuote', 'firstName', 'lastName', 'website']) assert.strictEqual(ctx.partnerPayload({ ...f, [k]: ' ' }), null, k);
 assert.strictEqual(ctx.partnerPayload({ ...f, partnerQuote: '0' }), null, 'zero quote');
 console.log('ok: partner payload');
+
+// Partner pages: the theme picks the name shown in "How much is your X quote?", the logo and the fonts.
+assert.strictEqual(ctx.partnerConfig('bem').name, 'BEM');
+assert.strictEqual(ctx.partnerConfig('hive').name, 'Hive');
+assert.strictEqual(ctx.partnerConfig('prism').name, 'Prism');
+assert.strictEqual(ctx.partnerConfig('prism').logo, 'prism_logo_white.png');
+for (const t of ['venue-pilot', null, 'constructor']) assert.strictEqual(ctx.partnerConfig(t), null, String(t));
+console.log('ok: partner config');
