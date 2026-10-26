@@ -36,18 +36,42 @@ function partnerPayload(f) {
     };
 }
 
+/**
+ * Partner pages: what changes per partner. The theme (bem, hive, prism) is also the partner tag
+ * sent to n8n. null for themes that aren't partners.
+ */
+function partnerConfig(theme) {
+    const partners = {
+        bem: { name: 'BEM', logo: 'bem_logo_white.png', logoAlt: 'Bauer Entertainment Marketing logo',
+            fonts: 'family=Lato:wght@300;400;700&family=Merriweather:wght@300;400' },
+        hive: { name: 'Hive', logo: 'hive_logo_white.png', logoAlt: 'Hive logo',
+            fonts: 'family=Anton&family=Archivo:wght@400;500;600' },
+        prism: { name: 'Prism', logo: 'prism_logo_white.png', logoAlt: 'Prism.fm logo',
+            fonts: 'family=Poppins:wght@400;500;600;700' },
+    };
+    return Object.hasOwn(partners, theme) ? partners[theme] : null;
+}
+
 class CustomForm extends HTMLElement {
     connectedCallback() {
         // Allow ?theme=venue-pilot on the page URL; an explicit data-theme wins.
         const theme = new URLSearchParams(window.location.search).get('theme');
         if (theme && !this.hasAttribute('data-theme')) this.setAttribute('data-theme', theme);
-        // @font-face is ignored inside shadow DOM, so theme fonts must be loaded on the page.
-        if (this.getAttribute('data-theme') === 'bem' && !document.getElementById('bem-fonts')) {
-            const fonts = document.createElement('link');
-            fonts.id = 'bem-fonts';
-            fonts.rel = 'stylesheet';
-            fonts.href = 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Merriweather:wght@300;400&display=swap';
-            document.head.appendChild(fonts);
+        const partner = partnerConfig(this.getAttribute('data-theme'));
+        if (partner) {
+            this.setAttribute('data-partner', '');
+            const logo = this.shadowRoot.querySelector('.partner-logo');
+            logo.src = new URL(partner.logo, this.assetBase).toString();
+            logo.alt = partner.logoAlt;
+            this.shadowRoot.getElementById('partnerQuoteLabel').textContent = `How much is your ${partner.name} quote?`;
+            // @font-face is ignored inside shadow DOM, so theme fonts must be loaded on the page.
+            if (!document.getElementById('partner-fonts')) {
+                const fonts = document.createElement('link');
+                fonts.id = 'partner-fonts';
+                fonts.rel = 'stylesheet';
+                fonts.href = `https://fonts.googleapis.com/css2?${partner.fonts}&display=swap`;
+                document.head.appendChild(fonts);
+            }
         }
         // In an iframe (e.g. soundcheckcapital.com/bem), post the card height like the Express form
         // does, so the parent's ExpressEmbed sizes the iframe. +48 = the single-page host padding.
@@ -68,9 +92,9 @@ class CustomForm extends HTMLElement {
         );
         const scriptSrc = scriptFromDom ? scriptFromDom.src : '';
         const assetBase = scriptSrc ? new URL('.', scriptSrc) : new URL('.', window.location.href);
+        this.assetBase = assetBase; // connectedCallback sets the partner logo from it
         const heroLogoSrc = new URL('logo_black_bold.svg', assetBase).toString();
         const logoSrc = new URL('../favicon.svg', assetBase).toString();
-        const bemLogoSrc = new URL('bem_logo_white.png', assetBase).toString();
 
         this.shadowRoot.innerHTML = `
             <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -548,10 +572,24 @@ input[type=range]::-moz-range-thumb {
     }
 }
 
-/* BEM (Bauer Entertainment Marketing): colors from bauerentertainmentmarketing.com */
+/* Partner pages (bem, hive, prism): partner logo instead of ours, their quote instead of our estimate */
 .partner-logo {
     display: none;
 }
+
+:host([data-partner]) .partner-logo {
+    display: block;
+    margin: 0 auto;
+    width: 180px;
+    height: auto;
+    filter: invert(1); /* white-on-transparent source logos */
+}
+
+:host([data-partner]) .hero-logo {
+    display: none;
+}
+
+/* BEM (Bauer Entertainment Marketing): colors from bauerentertainmentmarketing.com */
 
 :host([data-theme="bem"]) {
     --bem-font: 'Lato', sans-serif;
@@ -569,19 +607,7 @@ input[type=range]::-moz-range-thumb {
     background: #5F497A;
 }
 
-:host([data-theme="bem"]) .partner-logo {
-    display: block;
-    margin: 0 auto;
-    width: 180px;
-    height: auto;
-    filter: invert(1); /* white-on-transparent source logo */
-}
-
-:host([data-theme="bem"]) .hero-logo {
-    display: none;
-}
-
-/* Partner pages: the client already has a BEM quote, so ask for it instead of showing our estimate */
+/* The client already has a partner quote, so ask for it instead of showing our estimate */
 .partner-fields {
     display: none;
     flex-direction: column;
@@ -592,11 +618,11 @@ input[type=range]::-moz-range-thumb {
     margin: 6px 0 0 0;
 }
 
-:host([data-theme="bem"]) .partner-fields {
+:host([data-partner]) .partner-fields {
     display: flex;
 }
 
-:host([data-theme="bem"]) .eligibilityDiv {
+:host([data-partner]) .eligibilityDiv {
     display: none;
 }
 
@@ -661,10 +687,154 @@ input[type=range]::-moz-range-thumb {
 :host([data-theme="bem"]) .apply-btn:active {
     background: var(--bem-purple-dark);
 }
+
+/* Hive: near-black, square corners. Anton/Archivo stand in for their FK Screamer/FT Regola. */
+:host([data-theme="hive"]) {
+    --hive-dark: #131417;
+    --hive-track: #E2E3E7;
+    font-family: 'Archivo', sans-serif;
+    color: var(--hive-dark);
+}
+
+/* Same near-black as soundcheckcapital.com/hive, which embeds this page */
+:host([data-theme="hive"][data-appearance="single-page"]) {
+    background: #131417;
+}
+
+:host([data-theme="hive"]) #advanceForm,
+:host([data-theme="hive"]) .email-input,
+:host([data-theme="hive"]) .apply-btn {
+    border-radius: 0;
+}
+
+:host([data-theme="hive"]) .questions {
+    color: #4A4D55;
+}
+
+:host([data-theme="hive"]) .amount {
+    color: var(--hive-dark);
+}
+
+:host([data-theme="hive"]) input[type=range] {
+    background: transparent;
+}
+
+:host([data-theme="hive"]) input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--hive-dark) var(--progress), var(--hive-track) var(--progress));
+}
+
+:host([data-theme="hive"]) input[type=range]::-webkit-slider-thumb {
+    background: var(--hive-dark);
+}
+
+:host([data-theme="hive"]) input[type=range]::-moz-range-thumb {
+    background: var(--hive-dark);
+}
+
+:host([data-theme="hive"]) input[type=range]::-moz-range-progress {
+    background: var(--hive-dark);
+}
+
+:host([data-theme="hive"]) input[type=range]::-moz-range-track {
+    background: var(--hive-track);
+}
+
+:host([data-theme="hive"]) .email-input:focus {
+    outline: none;
+    border-color: var(--hive-dark);
+    box-shadow: 0 0 0 3px rgba(19, 20, 23, 0.15);
+}
+
+:host([data-theme="hive"]) .apply-btn {
+    background: var(--hive-dark);
+    font-family: 'Archivo', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+:host([data-theme="hive"]) .apply-btn:hover,
+:host([data-theme="hive"]) .apply-btn:active {
+    background: #2A2C31;
+}
+
+/* Prism.fm: purple gradient #6450C1 → #8412AF, Poppins */
+:host([data-theme="prism"]) {
+    --prism-violet: #6450C1;
+    --prism-purple: #8412AF;
+    --prism-track: #E4E1F3;
+    font-family: 'Poppins', sans-serif;
+    color: #1A303C;
+}
+
+/* Same gradient as soundcheckcapital.com/prism, which embeds this page */
+:host([data-theme="prism"][data-appearance="single-page"]) {
+    background: linear-gradient(180deg, #6450C1 0%, #8412AF 100%);
+}
+
+:host([data-theme="prism"]) #advanceForm {
+    border-radius: 16px;
+}
+
+:host([data-theme="prism"]) .email-input,
+:host([data-theme="prism"]) .apply-btn {
+    border-radius: 8px;
+}
+
+:host([data-theme="prism"]) .questions {
+    color: #465663;
+}
+
+:host([data-theme="prism"]) .amount {
+    color: #1A303C;
+}
+
+:host([data-theme="prism"]) input[type=range] {
+    background: transparent;
+}
+
+:host([data-theme="prism"]) input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--prism-violet) var(--progress), var(--prism-track) var(--progress));
+}
+
+:host([data-theme="prism"]) input[type=range]::-webkit-slider-thumb {
+    background: var(--prism-violet);
+}
+
+:host([data-theme="prism"]) input[type=range]::-moz-range-thumb {
+    background: var(--prism-violet);
+}
+
+:host([data-theme="prism"]) input[type=range]::-moz-range-progress {
+    background: var(--prism-violet);
+}
+
+:host([data-theme="prism"]) input[type=range]::-moz-range-track {
+    background: var(--prism-track);
+}
+
+:host([data-theme="prism"]) .email-input:focus {
+    outline: none;
+    border-color: var(--prism-violet);
+    box-shadow: 0 0 0 3px rgba(100, 80, 193, 0.15);
+}
+
+:host([data-theme="prism"]) .apply-btn {
+    background: linear-gradient(90deg, var(--prism-purple) 0%, var(--prism-violet) 100%);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+:host([data-theme="prism"]) .apply-btn:hover,
+:host([data-theme="prism"]) .apply-btn:active {
+    background: linear-gradient(90deg, #6E0E93 0%, #5443A8 100%);
+}
             </style>
             <form id="advanceForm">
             <div class="hero">
-                <img src="${bemLogoSrc}" class="partner-logo" alt="Bauer Entertainment Marketing logo">
+                <img class="partner-logo" alt="">
                 <img src="${heroLogoSrc}" class="hero-logo" alt="SoundCheck Capital logo">
             </div>
             <div class="slider-container">
@@ -688,7 +858,7 @@ input[type=range]::-moz-range-thumb {
                 <p class="eligibilityLabel">This estimate is based on your responses and SoundCheck's market insights. To receive a formal offer, please enter your email.</p>
             </div>
             <div class="partner-fields">
-                <p class="questions">How much is your BEM quote?</p>
+                <p class="questions" id="partnerQuoteLabel"></p>
                 <input id="partnerQuote" type="number" min="0" step="any" inputmode="decimal" class="email-input" placeholder="$150,000">
                 <input id="firstName" class="email-input" placeholder="First name" autocomplete="given-name">
                 <input id="lastName" class="email-input" placeholder="Last name" autocomplete="family-name">
@@ -783,14 +953,16 @@ input[type=range]::-moz-range-thumb {
         };
 
         // Partner pages go to the website simulator's n8n webhook instead of the Make email flow.
-        if (this.getAttribute('data-theme') === 'bem') {
+        const theme = this.getAttribute('data-theme');
+        const partner = partnerConfig(theme);
+        if (partner) {
             const field = (id) => this.shadowRoot.getElementById(id).value;
             data = partnerPayload({
-                partner: 'bem', partnerQuote: field('partnerQuote'), firstName: field('firstName'),
+                partner: theme, partnerQuote: field('partnerQuote'), firstName: field('firstName'),
                 lastName: field('lastName'), website: field('website'), email, years, events, sales, sourceUrl,
             });
             if (!data) {
-                alert("Please fill in your BEM quote, first name, last name and company website.");
+                alert(`Please fill in your ${partner.name} quote, first name, last name and company website.`);
                 return;
             }
             webhookUrl = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
