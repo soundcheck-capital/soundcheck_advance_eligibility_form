@@ -48,6 +48,9 @@ function partnerConfig(theme) {
             fonts: 'family=Anton&family=Archivo:wght@400;500;600' },
         prism: { name: 'Prism', logo: 'prism_logo_white.png', logoAlt: 'Prism.fm logo',
             fonts: 'family=Poppins:wght@400;500;600;700' },
+        // Not a vendor with a quote, and no ticketing-company question (it lists their competitors).
+        theticketingco: { name: 'The Ticketing Co.', logo: 'theticketingco_logo_white.svg', logoAlt: 'The Ticketing Co. logo',
+            quoteLabel: 'How much funding do you need?', cta: 'Apply for funding →' },
     };
     return Object.hasOwn(partners, theme) ? partners[theme] : null;
 }
@@ -63,9 +66,10 @@ class CustomForm extends HTMLElement {
             const logo = this.shadowRoot.querySelector('.partner-logo');
             logo.src = new URL(partner.logo, this.assetBase).toString();
             logo.alt = partner.logoAlt;
-            this.shadowRoot.getElementById('partnerQuoteLabel').textContent = `How much is your ${partner.name} quote?`;
+            this.shadowRoot.getElementById('partnerQuoteLabel').textContent = partner.quoteLabel || `How much is your ${partner.name} quote?`;
+            if (partner.cta) this.shadowRoot.querySelector('.apply-btn').textContent = partner.cta;
             // @font-face is ignored inside shadow DOM, so theme fonts must be loaded on the page.
-            if (!document.getElementById('partner-fonts')) {
+            if (partner.fonts && !document.getElementById('partner-fonts')) {
                 const fonts = document.createElement('link');
                 fonts.id = 'partner-fonts';
                 fonts.rel = 'stylesheet';
@@ -830,6 +834,78 @@ input[type=range]::-moz-range-thumb {
 :host([data-theme="prism"]) .apply-btn:hover,
 :host([data-theme="prism"]) .apply-btn:active {
     background: linear-gradient(90deg, #6E0E93 0%, #5443A8 100%);
+}
+
+/* The Ticketing Co.: same navy, blue and pill buttons as soundcheckcapital.com/theticketingco */
+:host([data-theme="theticketingco"]) {
+    --ttc-navy: #0B1320;
+    --ttc-blue: #0048FF;
+    --ttc-track: #E3E9F4;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: var(--ttc-navy);
+}
+
+/* Same navy as soundcheckcapital.com/theticketingco, which embeds this page */
+:host([data-theme="theticketingco"][data-appearance="single-page"]) {
+    background: var(--ttc-navy);
+}
+
+:host([data-theme="theticketingco"]) #advanceForm {
+    border-radius: 20px;
+}
+
+:host([data-theme="theticketingco"]) .email-input {
+    border-radius: 12px;
+}
+
+:host([data-theme="theticketingco"]) .apply-btn {
+    border-radius: 999px;
+    background: var(--ttc-blue);
+    font-family: inherit;
+    font-weight: 600;
+}
+
+:host([data-theme="theticketingco"]) .apply-btn:hover,
+:host([data-theme="theticketingco"]) .apply-btn:active {
+    background: #0036C2;
+}
+
+:host([data-theme="theticketingco"]) .questions {
+    color: #4A5568;
+}
+
+:host([data-theme="theticketingco"]) .amount {
+    color: var(--ttc-navy);
+}
+
+:host([data-theme="theticketingco"]) input[type=range] {
+    background: transparent;
+}
+
+:host([data-theme="theticketingco"]) input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--ttc-blue) var(--progress), var(--ttc-track) var(--progress));
+}
+
+:host([data-theme="theticketingco"]) input[type=range]::-webkit-slider-thumb {
+    background: var(--ttc-blue);
+}
+
+:host([data-theme="theticketingco"]) input[type=range]::-moz-range-thumb {
+    background: var(--ttc-blue);
+}
+
+:host([data-theme="theticketingco"]) input[type=range]::-moz-range-progress {
+    background: var(--ttc-blue);
+}
+
+:host([data-theme="theticketingco"]) input[type=range]::-moz-range-track {
+    background: var(--ttc-track);
+}
+
+:host([data-theme="theticketingco"]) .email-input:focus {
+    outline: none;
+    border-color: var(--ttc-blue);
+    box-shadow: 0 0 0 3px rgba(0, 72, 255, 0.15);
 }
             </style>
             <form id="advanceForm">
