@@ -37,7 +37,7 @@ function partnerPayload(f) {
 }
 
 /**
- * Partner pages: what changes per partner. The theme (bem, hive, prism) is also the partner tag
+ * Partner pages: what changes per partner. The theme (bem, hive, prism, wrstbnd) is also the partner tag
  * sent to n8n. null for themes that aren't partners.
  */
 function partnerConfig(theme) {
@@ -51,6 +51,8 @@ function partnerConfig(theme) {
         // Not a vendor with a quote, and no ticketing-company question (it lists their competitors).
         theticketingco: { name: 'The Ticketing Co.', logo: 'theticketingco_logo_white.svg', logoAlt: 'The Ticketing Co. logo',
             quoteLabel: 'How much funding do you need?', cta: 'Apply for funding →' },
+        wrstbnd: { name: 'WRSTBND', logo: 'wrstbnd_logo_white.svg', logoAlt: 'WRSTBND logo',
+            fonts: 'family=Work+Sans:wght@400;500;600' },
     };
     return Object.hasOwn(partners, theme) ? partners[theme] : null;
 }
@@ -906,6 +908,78 @@ input[type=range]::-moz-range-thumb {
     outline: none;
     border-color: var(--ttc-blue);
     box-shadow: 0 0 0 3px rgba(0, 72, 255, 0.15);
+}
+
+/* WRSTBND: midnight navy, magenta pill buttons, Work Sans, as on soundcheckcapital.com/wrstbnd */
+:host([data-theme="wrstbnd"]) {
+    --wb-navy: #001022;
+    --wb-magenta: #D7339A;
+    --wb-track: #E2E8F0;
+    font-family: 'Work Sans', sans-serif;
+    color: var(--wb-navy);
+}
+
+/* Same navy as soundcheckcapital.com/wrstbnd, which embeds this page */
+:host([data-theme="wrstbnd"][data-appearance="single-page"]) {
+    background: var(--wb-navy);
+}
+
+:host([data-theme="wrstbnd"]) #advanceForm {
+    border-radius: 16px;
+}
+
+:host([data-theme="wrstbnd"]) .email-input {
+    border-radius: 10px;
+}
+
+:host([data-theme="wrstbnd"]) .apply-btn {
+    border-radius: 999px;
+    background: linear-gradient(120deg, #FF52B2 0%, #D7339A 55%, #B3247F 100%);
+    font-family: inherit;
+    font-weight: 600;
+}
+
+:host([data-theme="wrstbnd"]) .apply-btn:hover,
+:host([data-theme="wrstbnd"]) .apply-btn:active {
+    background: linear-gradient(120deg, #E8449F 0%, #BE2A87 55%, #961C6A 100%);
+}
+
+:host([data-theme="wrstbnd"]) .questions {
+    color: #45566B;
+}
+
+:host([data-theme="wrstbnd"]) .amount {
+    color: var(--wb-navy);
+}
+
+:host([data-theme="wrstbnd"]) input[type=range] {
+    background: transparent;
+}
+
+:host([data-theme="wrstbnd"]) input[type=range]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--wb-magenta) var(--progress), var(--wb-track) var(--progress));
+}
+
+:host([data-theme="wrstbnd"]) input[type=range]::-webkit-slider-thumb {
+    background: var(--wb-magenta);
+}
+
+:host([data-theme="wrstbnd"]) input[type=range]::-moz-range-thumb {
+    background: var(--wb-magenta);
+}
+
+:host([data-theme="wrstbnd"]) input[type=range]::-moz-range-progress {
+    background: var(--wb-magenta);
+}
+
+:host([data-theme="wrstbnd"]) input[type=range]::-moz-range-track {
+    background: var(--wb-track);
+}
+
+:host([data-theme="wrstbnd"]) .email-input:focus {
+    outline: none;
+    border-color: var(--wb-magenta);
+    box-shadow: 0 0 0 3px rgba(215, 51, 154, 0.15);
 }
             </style>
             <form id="advanceForm">

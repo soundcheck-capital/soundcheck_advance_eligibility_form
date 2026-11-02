@@ -46,5 +46,6 @@ assert.strictEqual(ctx.partnerConfig('hive').name, 'Hive');
 assert.strictEqual(ctx.partnerConfig('prism').name, 'Prism');
 assert.strictEqual(ctx.partnerConfig('prism').logo, 'prism_logo_white.png');
 assert.strictEqual(ctx.partnerConfig('theticketingco').quoteLabel, 'How much funding do you need?');
+assert.strictEqual(ctx.partnerConfig('wrstbnd').name, 'WRSTBND');
 for (const t of ['venue-pilot', null, 'constructor']) assert.strictEqual(ctx.partnerConfig(t), null, String(t));
 console.log('ok: partner config');
