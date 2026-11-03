@@ -49,3 +49,14 @@ assert.strictEqual(ctx.partnerConfig('theticketingco').quoteLabel, 'How much fun
 assert.strictEqual(ctx.partnerConfig('wrstbnd').name, 'WRSTBND');
 for (const t of ['venue-pilot', null, 'constructor']) assert.strictEqual(ctx.partnerConfig(t), null, String(t));
 console.log('ok: partner config');
+
+// Every page (partner or not) posts to the n8n website webhook; Make "API /embeddedfinance" is retired.
+const src = fs.readFileSync(__dirname + '/assets/scriptform.js', 'utf8');
+assert.ok(!src.includes('hook.us1.make.com'), 'no Make webhook left');
+const s = ctx.simulatorPayload({ email: 'a@b.co', years: '5', events: '25', sales: '2500000', sourceUrl: 'https://x/shotgun/' });
+assert.strictEqual(s.formType, 'simulator');
+assert.strictEqual(s.email, 'a@b.co');
+assert.strictEqual(s.advanceAmount, 375000);
+assert.strictEqual(s.sourceUrl, 'https://x/shotgun/');
+assert.ok(!('partner' in s), 'no partner tag on plain pages');
+console.log('ok: plain pages payload');

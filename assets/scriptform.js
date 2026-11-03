@@ -12,27 +12,37 @@ function advanceMax(years, events, sales) {
     return Math.min(1000000, Math.round(rate * sales));
 }
 
-/**
- * Partner pages (bem): payload for the website simulator's n8n webhook, which creates contact +
- * company + deal in HubSpot tagged with the partner. null when a required field is missing.
- */
-function partnerPayload(f) {
-    const t = (v) => String(v ?? '').trim();
-    const partnerQuote = Number(t(f.partnerQuote));
-    if (!t(f.firstName) || !t(f.lastName) || !t(f.website) || !(partnerQuote > 0)) return null;
+// n8n "API /website": creates contact + deal in HubSpot, emails the estimate, pings #origination-underwriting.
+const WEBHOOK_URL = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
+
+/** Every page: the website simulator's payload (email only on plain pages). */
+function simulatorPayload(f) {
     return {
         formType: 'simulator',
-        partner: f.partner,
-        partnerQuote,
-        firstName: t(f.firstName),
-        lastName: t(f.lastName),
-        website: t(f.website),
         email: f.email,
         yearsInBusiness: f.years,
         numberOfEvents: f.events,
         grossTicketSales: f.sales,
         advanceAmount: advanceMax(Number(f.years), Number(f.events), Number(f.sales)),
         sourceUrl: f.sourceUrl,
+    };
+}
+
+/**
+ * Partner pages (bem): the simulator payload plus name, website and the partner tag + quote, so the
+ * HubSpot deal is tagged with the partner. null when a required field is missing.
+ */
+function partnerPayload(f) {
+    const t = (v) => String(v ?? '').trim();
+    const partnerQuote = Number(t(f.partnerQuote));
+    if (!t(f.firstName) || !t(f.lastName) || !t(f.website) || !(partnerQuote > 0)) return null;
+    return {
+        ...simulatorPayload(f),
+        partner: f.partner,
+        partnerQuote,
+        firstName: t(f.firstName),
+        lastName: t(f.lastName),
+        website: t(f.website),
     };
 }
 
@@ -1082,7 +1092,6 @@ input[type=range]::-moz-range-thumb {
         let sales = this.shadowRoot.getElementById("salesSlider").value;
         var events = this.shadowRoot.getElementById("eventsSlider").value;
         var years = this.shadowRoot.getElementById("yearsSlider").value;
-        var eligibility = this.shadowRoot.getElementById("eligibilityAmount").innerText;
 
         // Validation de l'email
         if (!email || !email.includes('@')) {
@@ -1090,19 +1099,10 @@ input[type=range]::-moz-range-thumb {
             return;
         }
 
-        let webhookUrl = "https://hook.us1.make.com/evf9ux3vu39oorpgerjpytmlada1kgee";
         const sourceUrl = window.location.href;
+        let data = simulatorPayload({ email, years, events, sales, sourceUrl });
 
-        let data = {
-            yearInBusiness: years,
-            numberOfEvent: events,
-            grossTicketSales: sales,
-            amountEligible: eligibility,
-            email: email,
-            sourceUrl: sourceUrl,
-        };
-
-        // Partner pages go to the website simulator's n8n webhook instead of the Make email flow.
+        // Partner pages also send name, website and the partner tag.
         const theme = this.getAttribute('data-theme');
         const partner = partnerConfig(theme);
         if (partner) {
@@ -1115,7 +1115,6 @@ input[type=range]::-moz-range-thumb {
                 alert(`Please fill in your ${partner.name} quote, first name, last name and company website.`);
                 return;
             }
-            webhookUrl = "https://soundcheck-capital.app.n8n.cloud/webhook/api/website";
         }
 
         // Afficher un indicateur de chargement
@@ -1124,7 +1123,7 @@ input[type=range]::-moz-range-thumb {
         submitButton.textContent = "Envoi en cours...";
         submitButton.disabled = true;
 
-        fetch(webhookUrl, {
+        fetch(WEBHOOK_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
