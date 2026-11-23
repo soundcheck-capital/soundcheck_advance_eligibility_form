@@ -1132,6 +1132,11 @@ input[type=range]::-moz-range-thumb {
         })
         .then(response => {
             if (response.ok) {
+                // Embedded (soundcheckcapital.com/<partner>): tell the page, for analytics.
+                // Partner slug only, no personal data, so '*' as target origin is fine.
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'soundcheck-express:submitted', partner: theme || null }, '*');
+                }
                 alert("Thank you for your submission. We’ll be in touch shortly.");
                 // Réinitialiser le formulaire si souhaité
                 this.shadowRoot.querySelector("#email").value = '';
